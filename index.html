@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Serene Scents Dashboard</title>
+  <style>
+    :root {
+      --ink: #f4fff8;
+      --muted: #a8beb4;
+      --line: rgba(207, 236, 221, 0.16);
+      --paper: #07100d;
+      --panel: rgba(15, 29, 25, 0.82);
+      --panel-strong: rgba(19, 38, 33, 0.94);
+      --sage: #62d2a2;
+      --blue: #5ac8fa;
+      --gold: #f2c14e;
+      --coral: #ff7a66;
+      --plum: #b68cff;
+      --mint: #9ef0c1;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --glow-blue: 0 0 28px rgba(90, 200, 250, 0.26);
+      --glow-sage: 0 0 30px rgba(98, 210, 162, 0.22);
+      --glow-gold: 0 0 28px rgba(242, 193, 78, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, #07100d 0%, #0c1915 34%, #15101c 66%, #07100d 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(158, 240, 193, 0.065) 0 1px, transparent 1px 128px),
+        linear-gradient(180deg, rgba(90, 200, 250, 0.045) 0 1px, transparent 1px 128px),
+        linear-gradient(120deg, rgba(90, 200, 250, 0.10), transparent 34%, rgba(242, 193, 78, 0.08) 68%, transparent);
+      opacity: 0.65;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: -30%;
+      width: 60%;
+      height: 2px;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(158, 240, 193, 0.85), rgba(90, 200, 250, 0.65), transparent);
+      animation: scanline 8s ease-in-out infinite;
+      opacity: 0.75;
+    }
+
+    @keyframes scanline {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(210%); }
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 26px;
+      background: rgba(5, 13, 11, 0.82);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.30);
+      backdrop-filter: blur(20px) saturate(1.25);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      min-width: 220px;
+    }
+
+    .brand strong {
+      font-size: 22px;
+      line-height: 1.1;
+      color: var(--ink);
+      text-shadow: 0 0 18px rgba(158, 240, 193, 0.18);
+    }
+
+    .brand span {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav button,
+    .utility button,
+    .toggle button {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 9px 13px;
+      cursor: pointer;
+      transition: 160ms ease;
+      min-height: 42px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .nav button.active,
+    .toggle button.active {
+      color: #06100d;
+      background: linear-gradient(135deg, var(--mint), var(--blue));
+      border-color: rgba(158, 240, 193, 0.62);
+      box-shadow: var(--glow-blue);
+    }
+
+    .nav button:hover,
+    .utility button:hover,
+    .toggle button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(158, 240, 193, 0.44);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.30), var(--glow-sage);
+    }
+
+    .utility {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      min-width: 190px;
+    }
+
+    main {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .hero-main,
+    .section,
+    .chart-panel,
+    .insight-panel,
+    .rec-panel,
+    .metric-card {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.025)),
+        var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px) saturate(1.15);
+    }
+
+    .hero-main::before,
+    .section::before,
+    .chart-panel::before,
+    .insight-panel::before,
+    .rec-panel::before,
+    .metric-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(158, 240, 193, 0.65), rgba(90, 200, 250, 0.42), transparent);
+      opacity: 0.9;
+    }
+
+    .hero-main > *,
+    .section > *,
+    .chart-panel > *,
+    .insight-panel > *,
+    .rec-panel > *,
+    .metric-card > * {
+      position: relative;
+    }
+
+    .hero-main {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 260px;
+    }
+
+    h1 {
+      font-size: 46px;
+      line-height: 1.02;
+      margin: 0 0 14px;
+      max-width: 760px;
+      letter-spacing: 0;
+      color: transparent;
+      background: linear-gradient(90deg, #f4fff8 0%, #9ef0c1 42%, #f2c14e 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      text-shadow: 0 0 34px rgba(158, 240, 193, 0.14);
+    }
+
+    .hero-main p {
+      color: var(--muted);
+      max-width: 840px;
+      font-size: 18px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .hero-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .strip-item {
+      border-left: 4px solid var(--sage);
+      padding: 8px 10px;
+      background: rgba(98, 210, 162, 0.10);
+      border-radius: 6px;
+      box-shadow: inset 0 0 0 1px rgba(98, 210, 162, 0.11);
+    }
+
+    .strip-item:nth-child(2) { border-left-color: var(--gold); background: rgba(242, 193, 78, 0.11); box-shadow: inset 0 0 0 1px rgba(242, 193, 78, 0.13); }
+    .strip-item:nth-child(3) { border-left-color: var(--coral); background: rgba(255, 122, 102, 0.10); box-shadow: inset 0 0 0 1px rgba(255, 122, 102, 0.12); }
+
+    .strip-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .strip-item strong {
+      font-size: 20px;
+      color: var(--ink);
+    }
+
+    .hero-side {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card {
+      padding: 18px;
+      min-height: 122px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .metric-card:nth-child(1),
+    .metric-card:nth-child(4) {
+      background:
+        linear-gradient(145deg, rgba(90, 200, 250, 0.17), rgba(255, 255, 255, 0.025)),
+        var(--panel);
+    }
+
+    .metric-card:nth-child(2),
+    .metric-card:nth-child(3) {
+      background:
+        linear-gradient(145deg, rgba(98, 210, 162, 0.17), rgba(255, 255, 255, 0.025)),
+        var(--panel);
+    }
+
+    .metric-card:nth-child(5),
+    .metric-card:nth-child(6) {
+      background:
+        linear-gradient(145deg, rgba(242, 193, 78, 0.16), rgba(255, 122, 102, 0.04)),
+        var(--panel);
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(158, 240, 193, 0.36);
+      box-shadow: var(--shadow), var(--glow-sage);
+    }
+
+    .metric-card .label {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .metric-card .value {
+      font-size: 31px;
+      font-weight: 750;
+      line-height: 1.05;
+      margin-top: 12px;
+      color: var(--ink);
+      text-shadow: 0 0 22px rgba(158, 240, 193, 0.16);
+    }
+
+    .metric-card .note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .section {
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .section-header h2,
+    .chart-panel h3,
+    .insight-panel h3,
+    .rec-panel h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .section-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      max-width: 780px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .chart-panel,
+    .insight-panel,
+    .rec-panel {
+      padding: 18px;
+      min-height: 420px;
+    }
+
+    .chart-panel h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .chart-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+      min-height: 38px;
+      line-height: 1.45;
+    }
+
+    .chart {
+      width: 100%;
+      height: 320px;
+      position: relative;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012)),
+        rgba(3, 10, 9, 0.22);
+    }
+
+    .chart.tall {
+      height: 440px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .chart rect,
+    .chart circle,
+    .chart path {
+      transition: opacity 150ms ease, filter 150ms ease, transform 150ms ease;
+    }
+
+    .chart rect:hover,
+    .chart circle:hover {
+      filter: drop-shadow(0 0 12px rgba(158, 240, 193, 0.42));
+    }
+
+    .axis text {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .axis line,
+    .axis path,
+    .grid-line {
+      stroke: rgba(214, 236, 224, 0.14);
+      stroke-width: 1;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .insight-list,
+    .rec-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .insight-item,
+    .rec-item {
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .insight-item:hover,
+    .rec-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(158, 240, 193, 0.35);
+    }
+
+    .insight-item strong,
+    .rec-item strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .insight-item p,
+    .rec-item p {
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(4, 12, 10, 0.42);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    th {
+      background: rgba(158, 240, 193, 0.08);
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    td {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    tbody tr:hover {
+      background: rgba(90, 200, 250, 0.07);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .tooltip {
+      position: fixed;
+      z-index: 40;
+      pointer-events: none;
+      background: rgba(4, 12, 10, 0.96);
+      color: var(--ink);
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(158, 240, 193, 0.30);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45), var(--glow-sage);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 280px;
+      opacity: 0;
+      transform: translate(-50%, -110%);
+      transition: opacity 100ms ease;
+    }
+
+    .callout {
+      border-left: 5px solid var(--gold);
+      background: rgba(242, 193, 78, 0.12);
+      padding: 16px 18px;
+      border-radius: 8px;
+      line-height: 1.5;
+      color: #f8e9b9;
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 0 1px rgba(242, 193, 78, 0.15);
+    }
+
+    .focus-mode .topbar {
+      padding: 10px 26px;
+    }
+
+    .focus-mode h1 {
+      font-size: 54px;
+    }
+
+    .focus-mode .metric-card .value {
+      font-size: 36px;
+    }
+
+    .focus-mode main {
+      max-width: 1680px;
+      padding: 22px;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-side {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .utility {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      main {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      .hero-strip,
+      .hero-side {
+        grid-template-columns: 1fr;
+      }
+
+      .chart {
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <strong>Serene Scents</strong>
+        <span>Interactive business analytics dashboard</span>
+      </div>
+      <nav class="nav" aria-label="Dashboard views">
+        <button class="active" data-view="overview">Overview</button>
+        <button data-view="trends">Trends</button>
+        <button data-view="forecast">Forecast</button>
+        <button data-view="operations">Operations</button>
+        <button data-view="recommendations">Recommendations</button>
+      </nav>
+      <div class="utility">
+        <button id="focusBtn">Meeting mode</button>
+        <button id="fullBtn">Fullscreen</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-main">
+          <div>
+            <h1>Scaling a handmade candle venture with sharper forecasting and operating discipline.</h1>
+            <p>Projection-ready view of revenue growth, profit progression, seasonality, forecast accuracy, procurement risk, and founder decisions for July 2025 to January 2026.</p>
+          </div>
+          <div class="hero-strip">
+            <div class="strip-item"><span>Analysis period</span><strong id="periodLabel"></strong></div>
+            <div class="strip-item"><span>Best operating day</span><strong id="bestDayLabel"></strong></div>
+            <div class="strip-item"><span>Primary decision</span><strong>Plan before peaks</strong></div>
+          </div>
+        </div>
+        <div class="hero-side" id="kpiCards"></div>
+      </section>
+
+      <section id="overview" class="view active">
+        <div class="section">
+          <div class="section-header">
+            <div>
+              <h2>Executive Snapshot</h2>
+              <p>The business reached nearly INR 20 lakh revenue while improving margin after procurement optimization. Seasonal demand created major upside, but forecast calibration and supplier readiness became the next management priorities.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="chart-panel">
+              <h3>Monthly revenue, profit, and margin</h3>
+              <div class="chart-note">Revenue scaled into December while margin stepped up after October cost optimization.</div>
+              <div class="chart" id="monthlyCombo"></div>
+              <div class="legend">
+                <span><i class="swatch" style="background: var(--blue)"></i>Revenue</span>
+                <span><i class="swatch" style="background: var(--sage)"></i>Profit</span>
+                <span><i class="swatch" style="background: var(--coral)"></i>Gross margin</span>
+              </div>
+            </div>
+            <div class="insight-panel">
+              <h3>Meeting talking points</h3>
+              <div class="insight-list" id="insightList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="trends" class="view">
+        <div class="section">
+          <div class="section-header">
+            <div>
+              <h2>Revenue and Demand Trends</h2>
+              <p>Use this view to explain how sales matured from small-batch volume into seasonal scale, with visible weekend and festival effects.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="chart-panel">
+              <h3>Daily revenue and 7-day trend</h3>
+              <div class="chart-note">The moving average smooths daily noise and makes the October to December growth curve easier to present.</div>
+              <div class="chart" id="dailyTrend"></div>
+            </div>
+            <div class="chart-panel">
+              <h3>Seasonality heatmap</h3>
+              <div class="chart-note">Average units by month and day of week. Darker cells show stronger demand concentration.</div>
+              <div class="chart tall" id="heatmap"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="forecast" class="view">
+        <div class="section">
+          <div class="section-header">
+            <div>
+              <h2>Forecast Performance</h2>
+              <p>The basic forecast was close in aggregate, while the advanced model became more useful as a stress-test scenario that needs calibration.</p>
+            </div>
+            <div class="toggle" aria-label="Forecast metric">
+              <button class="active" data-forecast-metric="revenue">Revenue</button>
+              <button data-forecast-metric="units">Units</button>
+              <button data-forecast-metric="profit">Profit</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="chart-panel">
+              <h3>Actual vs forecast by month</h3>
+              <div class="chart-note">Compare actuals with the original basic forecast and the advanced operating scenario.</div>
+              <div class="chart" id="forecastChart"></div>
+            </div>
+            <div class="chart-panel">
+              <h3>Model diagnostics</h3>
+              <div class="chart-note">Lower unit error is better. Revenue bias shows optimism or conservatism across the full period.</div>
+              <div class="chart" id="modelDiagnostics"></div>
+            </div>
+          </div>
+          <div class="section" style="box-shadow: none; margin: 18px 0 0; padding: 0; border: none; background: transparent;">
+            <div class="table-wrap">
+              <table id="modelTable"></table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="operations" class="view">
+        <div class="section">
+          <div class="section-header">
+            <div>
+              <h2>Operations and Risk</h2>
+              <p>Use this section to discuss procurement, capacity pressure, festival readiness, and revenue at risk from delivery disruptions.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="chart-panel">
+              <h3>Margin before and after cost optimization</h3>
+              <div class="chart-note">The biggest profitability unlock came from unit cost reduction, not price increases.</div>
+              <div class="chart" id="marginBars"></div>
+            </div>
+            <div class="chart-panel">
+              <h3>Simulated delivery delay risk</h3>
+              <div class="chart-note">Monthly revenue at risk from modeled procurement and delivery disruption days.</div>
+              <div class="chart" id="delayRisk"></div>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top: 18px;">
+            <div class="chart-panel">
+              <h3>Weekend demand lift</h3>
+              <div class="chart-note">Weekend demand required stronger production and fulfillment readiness.</div>
+              <div class="chart" id="weekdayBars"></div>
+            </div>
+            <div class="insight-panel">
+              <h3>Operating readout</h3>
+              <div class="callout" id="operatingCallout"></div>
+              <div class="table-wrap">
+                <table id="monthlyTable"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="recommendations" class="view">
+        <div class="section">
+          <div class="section-header">
+            <div>
+              <h2>Founder Recommendations</h2>
+              <p>Meeting-ready actions that connect the analysis to inventory, procurement, capacity, and forecast governance.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="rec-panel">
+              <h3>Suggested decisions</h3>
+              <div class="rec-list" id="recList"></div>
+            </div>
+            <div class="chart-panel">
+              <h3>Monthly performance table</h3>
+              <div class="chart-note">Use this table for direct Q&A when someone asks for the numbers behind the story.</div>
+              <div class="table-wrap">
+                <table id="performanceTable"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const DASHBOARD_DATA = {"meta":{"title":"Serene Scents","subtitle":"Business analytics and forecasting dashboard","period":"2025-07-01 to 2026-01-31","generatedFrom":"Processed Serene Scents portfolio datasets"},"kpis":{"Tenure":"2025-07-01 to 2026-01-31","Actual revenue":1996800.0,"Actual profit":834327.65,"Actual gross margin":0.41783235677083336,"Units sold":10240.0,"Average units per day":47.627906976744185,"Peak actual units per day":100.0,"July revenue":65130.0,"December revenue":505830.0,"July to December revenue growth":6.766467065868263,"Pre-optimization margin":0.33487179487179486,"Post-optimization margin":0.4346153846153846,"Festival avg daily revenue lift":0.5417587171128861,"Advanced forecast revenue bias":0.50244140625,"Basic forecast revenue bias":-0.01533203125,"Simulated delay days":8.0,"Simulated delay revenue at risk":37635.0},"monthly":[{"month":"2025-07","days":31.0,"units":334.0,"revenue":65130.0,"total_cost":43319.8,"profit":21810.2,"avg_daily_units":10.774193548387096,"avg_daily_revenue":2100.967741935484,"gross_margin":0.33487179487179486,"revenue_growth_pct":null},{"month":"2025-08","days":31.0,"units":604.0,"revenue":117780.0,"total_cost":78338.8,"profit":39441.2,"avg_daily_units":19.483870967741936,"avg_daily_revenue":3799.3548387096776,"gross_margin":0.33487179487179486,"revenue_growth_pct":0.8083832335329342},{"month":"2025-09","days":30.0,"units":785.0,"revenue":153075.0,"total_cost":101814.5,"profit":51260.5,"avg_daily_units":26.166666666666668,"avg_daily_revenue":5102.5,"gross_margin":0.33487179487179486,"revenue_growth_pct":0.29966887417218535},{"month":"2025-10","days":31.0,"units":1956.0,"revenue":381420.0,"total_cost":215649.0,"profit":165771.0,"avg_daily_units":63.096774193548384,"avg_daily_revenue":12303.870967741936,"gross_margin":0.4346153846153846,"revenue_growth_pct":1.4917197452229298},{"month":"2025-11","days":30.0,"units":2258.0,"revenue":440310.0,"total_cost":248944.5,"profit":191365.5,"avg_daily_units":75.26666666666667,"avg_daily_revenue":14677.0,"gross_margin":0.4346153846153846,"revenue_growth_pct":0.15439672801635984},{"month":"2025-12","days":31.0,"units":2594.0,"revenue":505830.0,"total_cost":285988.5,"profit":219841.5,"avg_daily_units":83.6774193548387,"avg_daily_revenue":16317.09677419355,"gross_margin":0.4346153846153846,"revenue_growth_pct":0.1488042515500443},{"month":"2026-01","days":31.0,"units":1709.0,"revenue":333255.0,"total_cost":188417.25,"profit":144837.75,"avg_daily_units":55.12903225806452,"avg_daily_revenue":10750.161290322581,"gross_margin":0.4346153846153846,"revenue_growth_pct":-0.3411719352351581}],"monthlyForecast":[{"month":"2025-07","actual_revenue":65130.0,"basic_revenue":72540.0,"advanced_revenue":117195.0,"actual_profit":21810.2,"basic_profit":24291.600000000006,"advanced_profit":39245.30000000001,"actual_units":334.0,"basic_units":372.0,"advanced_units":601.0,"basic_revenue_variance_pct":0.11377245508982035,"advanced_revenue_variance_pct":0.7994011976047904},{"month":"2025-08","actual_revenue":117780.0,"basic_revenue":105690.0,"advanced_revenue":224250.0,"actual_profit":39441.2,"basic_profit":35392.600000000006,"advanced_profit":75095.00000000001,"actual_units":604.0,"basic_units":542.0,"advanced_units":1150.0,"basic_revenue_variance_pct":-0.10264900662251655,"advanced_revenue_variance_pct":0.9039735099337748},{"month":"2025-09","actual_revenue":153075.0,"basic_revenue":147030.0,"advanced_revenue":311025.0,"actual_profit":51260.5,"basic_profit":49236.20000000001,"advanced_profit":104153.50000000001,"actual_units":785.0,"basic_units":754.0,"advanced_units":1595.0,"basic_revenue_variance_pct":-0.03949044585987261,"advanced_revenue_variance_pct":1.0318471337579618},{"month":"2025-10","actual_revenue":381420.0,"basic_revenue":219180.0,"advanced_revenue":498030.0,"actual_profit":165771.0,"basic_profit":95264.62000000001,"advanced_profit":216464.27000000002,"actual_units":1956.0,"basic_units":1124.0,"advanced_units":2554.0,"basic_revenue_variance_pct":-0.42535787321063395,"advanced_revenue_variance_pct":0.3057259713701431},{"month":"2025-11","actual_revenue":440310.0,"basic_revenue":305955.0,"advanced_revenue":525135.0,"actual_profit":191365.5,"basic_profit":132980.59500000003,"advanced_profit":228245.21500000003,"actual_units":2258.0,"basic_units":1569.0,"advanced_units":2693.0,"basic_revenue_variance_pct":-0.3051372896368468,"advanced_revenue_variance_pct":0.19264836138175376},{"month":"2025-12","actual_revenue":505830.0,"basic_revenue":455325.0,"advanced_revenue":625560.0,"actual_profit":219841.5,"basic_profit":197902.92500000002,"advanced_profit":271894.04000000004,"actual_units":2594.0,"basic_units":2335.0,"advanced_units":3208.0,"basic_revenue_variance_pct":-0.09984579799537394,"advanced_revenue_variance_pct":0.23670007710100233},{"month":"2026-01","actual_revenue":333255.0,"basic_revenue":660465.0,"advanced_revenue":698880.0,"actual_profit":144837.75,"basic_profit":287065.18500000006,"advanced_profit":303761.92000000004,"actual_units":1709.0,"basic_units":3387.0,"advanced_units":3584.0,"basic_revenue_variance_pct":0.9818607372732592,"advanced_revenue_variance_pct":1.0971328262141604}],"daily":[{"date":"2025-07-01","month":"2025-07","day":"Tuesday","units":6.0,"revenue":1170.0,"profit":391.8,"margin":0.33487179487179486,"basicRevenue":1950.0,"advancedRevenue":1950.0,"basicUnits":10.0,"advancedUnits":10.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-02","month":"2025-07","day":"Wednesday","units":6.0,"revenue":1170.0,"profit":391.8,"margin":0.33487179487179486,"basicRevenue":1950.0,"advancedRevenue":4680.0,"basicUnits":10.0,"advancedUnits":24.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-03","month":"2025-07","day":"Thursday","units":7.0,"revenue":1365.0,"profit":457.1,"margin":0.3348717948717949,"basicRevenue":1950.0,"advancedRevenue":1950.0,"basicUnits":10.0,"advancedUnits":10.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-04","month":"2025-07","day":"Friday","units":6.0,"revenue":1170.0,"profit":391.8,"margin":0.33487179487179486,"basicRevenue":1950.0,"advancedRevenue":3120.0,"basicUnits":10.0,"advancedUnits":16.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-05","month":"2025-07","day":"Saturday","units":14.0,"revenue":2730.0,"profit":914.2,"margin":0.3348717948717949,"basicRevenue":1950.0,"advancedRevenue":3315.0,"basicUnits":10.0,"advancedUnits":17.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-06","month":"2025-07","day":"Sunday","units":14.0,"revenue":2730.0,"profit":914.2,"margin":0.3348717948717949,"basicRevenue":2145.0,"advancedRevenue":2145.0,"basicUnits":11.0,"advancedUnits":11.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-07","month":"2025-07","day":"Monday","units":7.0,"revenue":1365.0,"profit":457.1,"margin":0.3348717948717949,"basicRevenue":2145.0,"advancedRevenue":2340.0,"basicUnits":11.0,"advancedUnits":12.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-08","month":"2025-07","day":"Tuesday","units":7.0,"revenue":1365.0,"profit":457.1,"margin":0.3348717948717949,"basicRevenue":2145.0,"advancedRevenue":3510.0,"basicUnits":11.0,"advancedUnits":18.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-09","month":"2025-07","day":"Wednesday","units":8.0,"revenue":1560.0,"profit":522.4,"margin":0.33487179487179486,"basicRevenue":2145.0,"advancedRevenue":3315.0,"basicUnits":11.0,"advancedUnits":17.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-10","month":"2025-07","day":"Thursday","units":6.0,"revenue":1170.0,"profit":391.8,"margin":0.33487179487179486,"basicRevenue":2145.0,"advancedRevenue":3315.0,"basicUnits":11.0,"advancedUnits":17.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-11","month":"2025-07","day":"Friday","units":7.0,"revenue":1365.0,"profit":457.1,"margin":0.3348717948717949,"basicRevenue":2145.0,"advancedRevenue":4485.0,"basicUnits":11.0,"advancedUnits":23.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-12","month":"2025-07","day":"Saturday","units":15.0,"revenue":2925.0,"profit":979.5,"margin":0.33487179487179486,"basicRevenue":2145.0,"advancedRevenue":2535.0,"basicUnits":11.0,"advancedUnits":13.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-13","month":"2025-07","day":"Sunday","units":16.0,"revenue":3120.0,"profit":1044.8,"margin":0.33487179487179486,"basicRevenue":2340.0,"advancedRevenue":4875.0,"basicUnits":12.0,"advancedUnits":25.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-14","month":"2025-07","day":"Monday","units":8.0,"revenue":1560.0,"profit":522.4,"margin":0.33487179487179486,"basicRevenue":2340.0,"advancedRevenue":3120.0,"basicUnits":12.0,"advancedUnits":16.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-15","month":"2025-07","day":"Tuesday","units":7.0,"revenue":1365.0,"profit":457.1,"margin":0.3348717948717949,"basicRevenue":2340.0,"advancedRevenue":4290.0,"basicUnits":12.0,"advancedUnits":22.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-16","month":"2025-07","day":"Wednesday","units":8.0,"revenue":1560.0,"profit":522.4,"margin":0.33487179487179486,"basicRevenue":2340.0,"advancedRevenue":4095.0,"basicUnits":12.0,"advancedUnits":21.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-17","month":"2025-07","day":"Thursday","units":8.0,"revenue":1560.0,"profit":522.4,"margin":0.33487179487179486,"basicRevenue":2340.0,"advancedRevenue":4290.0,"basicUnits":12.0,"advancedUnits":22.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-18","month":"2025-07","day":"Friday","units":10.0,"revenue":1950.0,"profit":653.0,"margin":0.33487179487179486,"basicRevenue":2340.0,"advancedRevenue":3900.0,"basicUnits":12.0,"advancedUnits":20.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-19","month":"2025-07","day":"Saturday","units":15.0,"revenue":2925.0,"profit":979.5,"margin":0.33487179487179486,"basicRevenue":2340.0,"advancedRevenue":4290.0,"basicUnits":12.0,"advancedUnits":22.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-20","month":"2025-07","day":"Sunday","units":20.0,"revenue":3900.0,"profit":1306.0,"margin":0.33487179487179486,"basicRevenue":2535.0,"advancedRevenue":2730.0,"basicUnits":13.0,"advancedUnits":14.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-21","month":"2025-07","day":"Monday","units":11.0,"revenue":2145.0,"profit":718.3,"margin":0.33487179487179486,"basicRevenue":2535.0,"advancedRevenue":3510.0,"basicUnits":13.0,"advancedUnits":18.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-22","month":"2025-07","day":"Tuesday","units":12.0,"revenue":2340.0,"profit":783.6,"margin":0.33487179487179486,"basicRevenue":2535.0,"advancedRevenue":3510.0,"basicUnits":13.0,"advancedUnits":18.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-23","month":"2025-07","day":"Wednesday","units":9.0,"revenue":1755.0,"profit":587.7,"margin":0.3348717948717949,"basicRevenue":2535.0,"advancedRevenue":4680.0,"basicUnits":13.0,"advancedUnits":24.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-24","month":"2025-07","day":"Thursday","units":8.0,"revenue":1560.0,"profit":522.4,"margin":0.33487179487179486,"basicRevenue":2535.0,"advancedRevenue":4290.0,"basicUnits":13.0,"advancedUnits":22.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-25","month":"2025-07","day":"Friday","units":12.0,"revenue":2340.0,"profit":783.6,"margin":0.33487179487179486,"basicRevenue":2535.0,"advancedRevenue":5655.0,"basicUnits":13.0,"advancedUnits":29.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-26","month":"2025-07","day":"Saturday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":2535.0,"advancedRevenue":3705.0,"basicUnits":13.0,"advancedUnits":19.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-27","month":"2025-07","day":"Sunday","units":22.0,"revenue":4290.0,"profit":1436.6,"margin":0.33487179487179486,"basicRevenue":2730.0,"advancedRevenue":2340.0,"basicUnits":14.0,"advancedUnits":12.0,"isWeekend":true,"isFestival":false},{"date":"2025-07-28","month":"2025-07","day":"Monday","units":12.0,"revenue":2340.0,"profit":783.6,"margin":0.33487179487179486,"basicRevenue":2730.0,"advancedRevenue":1950.0,"basicUnits":14.0,"advancedUnits":10.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-29","month":"2025-07","day":"Tuesday","units":13.0,"revenue":2535.0,"profit":848.9,"margin":0.33487179487179486,"basicRevenue":2730.0,"advancedRevenue":5070.0,"basicUnits":14.0,"advancedUnits":26.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-30","month":"2025-07","day":"Wednesday","units":13.0,"revenue":2535.0,"profit":848.9,"margin":0.33487179487179486,"basicRevenue":2730.0,"advancedRevenue":7800.0,"basicUnits":14.0,"advancedUnits":40.0,"isWeekend":false,"isFestival":false},{"date":"2025-07-31","month":"2025-07","day":"Thursday","units":10.0,"revenue":1950.0,"profit":653.0,"margin":0.33487179487179486,"basicRevenue":2730.0,"advancedRevenue":6435.0,"basicUnits":14.0,"advancedUnits":33.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-01","month":"2025-08","day":"Friday","units":12.0,"revenue":2340.0,"profit":783.6,"margin":0.33487179487179486,"basicRevenue":2730.0,"advancedRevenue":5850.0,"basicUnits":14.0,"advancedUnits":30.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-02","month":"2025-08","day":"Saturday","units":19.0,"revenue":3705.0,"profit":1240.7,"margin":0.33487179487179486,"basicRevenue":2925.0,"advancedRevenue":6240.0,"basicUnits":15.0,"advancedUnits":32.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-03","month":"2025-08","day":"Sunday","units":20.0,"revenue":3900.0,"profit":1306.0,"margin":0.33487179487179486,"basicRevenue":2925.0,"advancedRevenue":4875.0,"basicUnits":15.0,"advancedUnits":25.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-04","month":"2025-08","day":"Monday","units":13.0,"revenue":2535.0,"profit":848.9,"margin":0.33487179487179486,"basicRevenue":2925.0,"advancedRevenue":5655.0,"basicUnits":15.0,"advancedUnits":29.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-05","month":"2025-08","day":"Tuesday","units":14.0,"revenue":2730.0,"profit":914.2,"margin":0.3348717948717949,"basicRevenue":2925.0,"advancedRevenue":7605.0,"basicUnits":15.0,"advancedUnits":39.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-06","month":"2025-08","day":"Wednesday","units":14.0,"revenue":2730.0,"profit":914.2,"margin":0.3348717948717949,"basicRevenue":2925.0,"advancedRevenue":6825.0,"basicUnits":15.0,"advancedUnits":35.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-07","month":"2025-08","day":"Thursday","units":12.0,"revenue":2340.0,"profit":783.6,"margin":0.33487179487179486,"basicRevenue":3120.0,"advancedRevenue":7995.0,"basicUnits":16.0,"advancedUnits":41.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-08","month":"2025-08","day":"Friday","units":11.0,"revenue":2145.0,"profit":718.3,"margin":0.33487179487179486,"basicRevenue":3120.0,"advancedRevenue":10140.0,"basicUnits":16.0,"advancedUnits":52.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-09","month":"2025-08","day":"Saturday","units":28.0,"revenue":5460.0,"profit":1828.4,"margin":0.3348717948717949,"basicRevenue":3120.0,"advancedRevenue":7605.0,"basicUnits":16.0,"advancedUnits":39.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-10","month":"2025-08","day":"Sunday","units":23.0,"revenue":4485.0,"profit":1501.9,"margin":0.3348717948717949,"basicRevenue":3120.0,"advancedRevenue":6435.0,"basicUnits":16.0,"advancedUnits":33.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-11","month":"2025-08","day":"Monday","units":14.0,"revenue":2730.0,"profit":914.2,"margin":0.3348717948717949,"basicRevenue":3120.0,"advancedRevenue":5460.0,"basicUnits":16.0,"advancedUnits":28.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-12","month":"2025-08","day":"Tuesday","units":15.0,"revenue":2925.0,"profit":979.5,"margin":0.33487179487179486,"basicRevenue":3315.0,"advancedRevenue":6630.0,"basicUnits":17.0,"advancedUnits":34.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-13","month":"2025-08","day":"Wednesday","units":16.0,"revenue":3120.0,"profit":1044.8,"margin":0.33487179487179486,"basicRevenue":3315.0,"advancedRevenue":9750.0,"basicUnits":17.0,"advancedUnits":50.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-14","month":"2025-08","day":"Thursday","units":12.0,"revenue":2340.0,"profit":783.6,"margin":0.33487179487179486,"basicRevenue":3315.0,"advancedRevenue":9165.0,"basicUnits":17.0,"advancedUnits":47.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-15","month":"2025-08","day":"Friday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":3315.0,"advancedRevenue":7995.0,"basicUnits":17.0,"advancedUnits":41.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-16","month":"2025-08","day":"Saturday","units":28.0,"revenue":5460.0,"profit":1828.4,"margin":0.3348717948717949,"basicRevenue":3315.0,"advancedRevenue":4875.0,"basicUnits":17.0,"advancedUnits":25.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-17","month":"2025-08","day":"Sunday","units":29.0,"revenue":5655.0,"profit":1893.7,"margin":0.33487179487179486,"basicRevenue":3510.0,"advancedRevenue":5265.0,"basicUnits":18.0,"advancedUnits":27.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-18","month":"2025-08","day":"Monday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":3510.0,"advancedRevenue":5460.0,"basicUnits":18.0,"advancedUnits":28.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-19","month":"2025-08","day":"Tuesday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":3510.0,"advancedRevenue":8190.0,"basicUnits":18.0,"advancedUnits":42.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-20","month":"2025-08","day":"Wednesday","units":16.0,"revenue":3120.0,"profit":1044.8,"margin":0.33487179487179486,"basicRevenue":3510.0,"advancedRevenue":8385.0,"basicUnits":18.0,"advancedUnits":43.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-21","month":"2025-08","day":"Thursday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":3510.0,"advancedRevenue":10335.0,"basicUnits":18.0,"advancedUnits":53.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-22","month":"2025-08","day":"Friday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":3705.0,"advancedRevenue":7410.0,"basicUnits":19.0,"advancedUnits":38.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-23","month":"2025-08","day":"Saturday","units":31.0,"revenue":6045.0,"profit":2024.3,"margin":0.33487179487179486,"basicRevenue":3705.0,"advancedRevenue":4680.0,"basicUnits":19.0,"advancedUnits":24.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-24","month":"2025-08","day":"Sunday","units":37.0,"revenue":7215.0,"profit":2416.1,"margin":0.33487179487179486,"basicRevenue":3705.0,"advancedRevenue":4680.0,"basicUnits":19.0,"advancedUnits":24.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-25","month":"2025-08","day":"Monday","units":19.0,"revenue":3705.0,"profit":1240.7,"margin":0.33487179487179486,"basicRevenue":3705.0,"advancedRevenue":5850.0,"basicUnits":19.0,"advancedUnits":30.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-26","month":"2025-08","day":"Tuesday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":3900.0,"advancedRevenue":6825.0,"basicUnits":20.0,"advancedUnits":35.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-27","month":"2025-08","day":"Wednesday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":3900.0,"advancedRevenue":9750.0,"basicUnits":20.0,"advancedUnits":50.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-28","month":"2025-08","day":"Thursday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":3900.0,"advancedRevenue":11115.0,"basicUnits":20.0,"advancedUnits":57.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-29","month":"2025-08","day":"Friday","units":15.0,"revenue":2925.0,"profit":979.5,"margin":0.33487179487179486,"basicRevenue":3900.0,"advancedRevenue":10140.0,"basicUnits":20.0,"advancedUnits":52.0,"isWeekend":false,"isFestival":false},{"date":"2025-08-30","month":"2025-08","day":"Saturday","units":37.0,"revenue":7215.0,"profit":2416.1,"margin":0.33487179487179486,"basicRevenue":4095.0,"advancedRevenue":7215.0,"basicUnits":21.0,"advancedUnits":37.0,"isWeekend":true,"isFestival":false},{"date":"2025-08-31","month":"2025-08","day":"Sunday","units":28.0,"revenue":5460.0,"profit":1828.4,"margin":0.3348717948717949,"basicRevenue":4095.0,"advancedRevenue":5850.0,"basicUnits":21.0,"advancedUnits":30.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-01","month":"2025-09","day":"Monday","units":19.0,"revenue":3705.0,"profit":1240.7,"margin":0.33487179487179486,"basicRevenue":4095.0,"advancedRevenue":6825.0,"basicUnits":21.0,"advancedUnits":35.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-02","month":"2025-09","day":"Tuesday","units":19.0,"revenue":3705.0,"profit":1240.7,"margin":0.33487179487179486,"basicRevenue":4095.0,"advancedRevenue":10530.0,"basicUnits":21.0,"advancedUnits":54.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-03","month":"2025-09","day":"Wednesday","units":20.0,"revenue":3900.0,"profit":1306.0,"margin":0.33487179487179486,"basicRevenue":4290.0,"advancedRevenue":10530.0,"basicUnits":22.0,"advancedUnits":54.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-04","month":"2025-09","day":"Thursday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":4290.0,"advancedRevenue":13455.0,"basicUnits":22.0,"advancedUnits":69.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-05","month":"2025-09","day":"Friday","units":15.0,"revenue":2925.0,"profit":979.5,"margin":0.33487179487179486,"basicRevenue":4290.0,"advancedRevenue":11115.0,"basicUnits":22.0,"advancedUnits":57.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-06","month":"2025-09","day":"Saturday","units":43.0,"revenue":8385.0,"profit":2807.9,"margin":0.33487179487179486,"basicRevenue":4290.0,"advancedRevenue":10920.0,"basicUnits":22.0,"advancedUnits":56.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-07","month":"2025-09","day":"Sunday","units":43.0,"revenue":8385.0,"profit":2807.9,"margin":0.33487179487179486,"basicRevenue":4485.0,"advancedRevenue":8580.0,"basicUnits":23.0,"advancedUnits":44.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-08","month":"2025-09","day":"Monday","units":22.0,"revenue":4290.0,"profit":1436.6,"margin":0.33487179487179486,"basicRevenue":4485.0,"advancedRevenue":8775.0,"basicUnits":23.0,"advancedUnits":45.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-09","month":"2025-09","day":"Tuesday","units":23.0,"revenue":4485.0,"profit":1501.9,"margin":0.3348717948717949,"basicRevenue":4485.0,"advancedRevenue":11700.0,"basicUnits":23.0,"advancedUnits":60.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-10","month":"2025-09","day":"Wednesday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":4485.0,"advancedRevenue":12675.0,"basicUnits":23.0,"advancedUnits":65.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-11","month":"2025-09","day":"Thursday","units":21.0,"revenue":4095.0,"profit":1371.3,"margin":0.33487179487179486,"basicRevenue":4680.0,"advancedRevenue":13455.0,"basicUnits":24.0,"advancedUnits":69.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-12","month":"2025-09","day":"Friday","units":22.0,"revenue":4290.0,"profit":1436.6,"margin":0.33487179487179486,"basicRevenue":4680.0,"advancedRevenue":11700.0,"basicUnits":24.0,"advancedUnits":60.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-13","month":"2025-09","day":"Saturday","units":46.0,"revenue":8970.0,"profit":3003.8,"margin":0.3348717948717949,"basicRevenue":4680.0,"advancedRevenue":9360.0,"basicUnits":24.0,"advancedUnits":48.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-14","month":"2025-09","day":"Sunday","units":36.0,"revenue":7020.0,"profit":2350.8,"margin":0.3348717948717949,"basicRevenue":4875.0,"advancedRevenue":8970.0,"basicUnits":25.0,"advancedUnits":46.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-15","month":"2025-09","day":"Monday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":4875.0,"advancedRevenue":8775.0,"basicUnits":25.0,"advancedUnits":45.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-16","month":"2025-09","day":"Tuesday","units":17.0,"revenue":3315.0,"profit":1110.1,"margin":0.33487179487179486,"basicRevenue":4875.0,"advancedRevenue":9750.0,"basicUnits":25.0,"advancedUnits":50.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-17","month":"2025-09","day":"Wednesday","units":24.0,"revenue":4680.0,"profit":1567.2,"margin":0.33487179487179486,"basicRevenue":4875.0,"advancedRevenue":10920.0,"basicUnits":25.0,"advancedUnits":56.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-18","month":"2025-09","day":"Thursday","units":19.0,"revenue":3705.0,"profit":1240.7,"margin":0.33487179487179486,"basicRevenue":5070.0,"advancedRevenue":10530.0,"basicUnits":26.0,"advancedUnits":54.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-19","month":"2025-09","day":"Friday","units":25.0,"revenue":4875.0,"profit":1632.5,"margin":0.33487179487179486,"basicRevenue":5070.0,"advancedRevenue":11505.0,"basicUnits":26.0,"advancedUnits":59.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-20","month":"2025-09","day":"Saturday","units":45.0,"revenue":8775.0,"profit":2938.5,"margin":0.33487179487179486,"basicRevenue":5070.0,"advancedRevenue":10140.0,"basicUnits":26.0,"advancedUnits":52.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-21","month":"2025-09","day":"Sunday","units":38.0,"revenue":7410.0,"profit":2481.4,"margin":0.33487179487179486,"basicRevenue":5265.0,"advancedRevenue":6435.0,"basicUnits":27.0,"advancedUnits":33.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-22","month":"2025-09","day":"Monday","units":20.0,"revenue":3900.0,"profit":1306.0,"margin":0.33487179487179486,"basicRevenue":5265.0,"advancedRevenue":8580.0,"basicUnits":27.0,"advancedUnits":44.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-23","month":"2025-09","day":"Tuesday","units":18.0,"revenue":3510.0,"profit":1175.4,"margin":0.3348717948717949,"basicRevenue":5265.0,"advancedRevenue":7215.0,"basicUnits":27.0,"advancedUnits":37.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-24","month":"2025-09","day":"Wednesday","units":23.0,"revenue":4485.0,"profit":1501.9,"margin":0.3348717948717949,"basicRevenue":5460.0,"advancedRevenue":11310.0,"basicUnits":28.0,"advancedUnits":58.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-25","month":"2025-09","day":"Thursday","units":21.0,"revenue":4095.0,"profit":1371.3,"margin":0.33487179487179486,"basicRevenue":5460.0,"advancedRevenue":11115.0,"basicUnits":28.0,"advancedUnits":57.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-26","month":"2025-09","day":"Friday","units":21.0,"revenue":4095.0,"profit":1371.3,"margin":0.33487179487179486,"basicRevenue":5460.0,"advancedRevenue":12285.0,"basicUnits":28.0,"advancedUnits":63.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-27","month":"2025-09","day":"Saturday","units":42.0,"revenue":8190.0,"profit":2742.6,"margin":0.33487179487179486,"basicRevenue":5655.0,"advancedRevenue":11310.0,"basicUnits":29.0,"advancedUnits":58.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-28","month":"2025-09","day":"Sunday","units":42.0,"revenue":8190.0,"profit":2742.6,"margin":0.33487179487179486,"basicRevenue":5655.0,"advancedRevenue":9360.0,"basicUnits":29.0,"advancedUnits":48.0,"isWeekend":true,"isFestival":false},{"date":"2025-09-29","month":"2025-09","day":"Monday","units":25.0,"revenue":4875.0,"profit":1632.5,"margin":0.33487179487179486,"basicRevenue":5655.0,"advancedRevenue":11505.0,"basicUnits":29.0,"advancedUnits":59.0,"isWeekend":false,"isFestival":false},{"date":"2025-09-30","month":"2025-09","day":"Tuesday","units":24.0,"revenue":4680.0,"profit":1567.2,"margin":0.33487179487179486,"basicRevenue":5850.0,"advancedRevenue":11700.0,"basicUnits":30.0,"advancedUnits":60.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-01","month":"2025-10","day":"Wednesday","units":41.0,"revenue":7995.0,"profit":3474.75,"margin":0.4346153846153846,"basicRevenue":5850.0,"advancedRevenue":15015.0,"basicUnits":30.0,"advancedUnits":77.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-02","month":"2025-10","day":"Thursday","units":38.0,"revenue":7410.0,"profit":3220.5,"margin":0.4346153846153846,"basicRevenue":5850.0,"advancedRevenue":17355.0,"basicUnits":30.0,"advancedUnits":89.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-03","month":"2025-10","day":"Friday","units":54.0,"revenue":10530.0,"profit":4576.5,"margin":0.4346153846153846,"basicRevenue":6045.0,"advancedRevenue":14040.0,"basicUnits":31.0,"advancedUnits":72.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-04","month":"2025-10","day":"Saturday","units":94.0,"revenue":18330.0,"profit":7966.5,"margin":0.4346153846153846,"basicRevenue":6045.0,"advancedRevenue":13845.0,"basicUnits":31.0,"advancedUnits":71.0,"isWeekend":true,"isFestival":false},{"date":"2025-10-05","month":"2025-10","day":"Sunday","units":76.0,"revenue":14820.0,"profit":6441.0,"margin":0.4346153846153846,"basicRevenue":6240.0,"advancedRevenue":12285.0,"basicUnits":32.0,"advancedUnits":63.0,"isWeekend":true,"isFestival":false},{"date":"2025-10-06","month":"2025-10","day":"Monday","units":46.0,"revenue":8970.0,"profit":3898.5,"margin":0.4346153846153846,"basicRevenue":6240.0,"advancedRevenue":11700.0,"basicUnits":32.0,"advancedUnits":60.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-07","month":"2025-10","day":"Tuesday","units":46.0,"revenue":8970.0,"profit":3898.5,"margin":0.4346153846153846,"basicRevenue":6240.0,"advancedRevenue":14625.0,"basicUnits":32.0,"advancedUnits":75.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-08","month":"2025-10","day":"Wednesday","units":42.0,"revenue":8190.0,"profit":3559.5,"margin":0.4346153846153846,"basicRevenue":6435.0,"advancedRevenue":16185.0,"basicUnits":33.0,"advancedUnits":83.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-09","month":"2025-10","day":"Thursday","units":42.0,"revenue":8190.0,"profit":3559.5,"margin":0.4346153846153846,"basicRevenue":6435.0,"advancedRevenue":16575.0,"basicUnits":33.0,"advancedUnits":85.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-10","month":"2025-10","day":"Friday","units":58.0,"revenue":11310.0,"profit":4915.5,"margin":0.4346153846153846,"basicRevenue":6630.0,"advancedRevenue":15405.0,"basicUnits":34.0,"advancedUnits":79.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-11","month":"2025-10","day":"Saturday","units":95.0,"revenue":18525.0,"profit":8051.25,"margin":0.4346153846153846,"basicRevenue":6630.0,"advancedRevenue":13260.0,"basicUnits":34.0,"advancedUnits":68.0,"isWeekend":true,"isFestival":false},{"date":"2025-10-12","month":"2025-10","day":"Sunday","units":81.0,"revenue":15795.0,"profit":6864.75,"margin":0.4346153846153846,"basicRevenue":6630.0,"advancedRevenue":11700.0,"basicUnits":34.0,"advancedUnits":60.0,"isWeekend":true,"isFestival":false},{"date":"2025-10-13","month":"2025-10","day":"Monday","units":47.0,"revenue":9165.0,"profit":3983.25,"margin":0.4346153846153846,"basicRevenue":6825.0,"advancedRevenue":12870.0,"basicUnits":35.0,"advancedUnits":66.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-14","month":"2025-10","day":"Tuesday","units":63.0,"revenue":12285.0,"profit":5339.25,"margin":0.4346153846153846,"basicRevenue":6825.0,"advancedRevenue":14235.0,"basicUnits":35.0,"advancedUnits":73.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-15","month":"2025-10","day":"Wednesday","units":57.0,"revenue":11115.0,"profit":4830.75,"margin":0.4346153846153846,"basicRevenue":7020.0,"advancedRevenue":15795.0,"basicUnits":36.0,"advancedUnits":81.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-16","month":"2025-10","day":"Thursday","units":61.0,"revenue":11895.0,"profit":5169.75,"margin":0.4346153846153846,"basicRevenue":7020.0,"advancedRevenue":15405.0,"basicUnits":36.0,"advancedUnits":79.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-17","month":"2025-10","day":"Friday","units":57.0,"revenue":11115.0,"profit":4830.75,"margin":0.4346153846153846,"basicRevenue":7020.0,"advancedRevenue":21060.0,"basicUnits":36.0,"advancedUnits":108.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-18","month":"2025-10","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":7215.0,"advancedRevenue":18135.0,"basicUnits":37.0,"advancedUnits":93.0,"isWeekend":true,"isFestival":true},{"date":"2025-10-19","month":"2025-10","day":"Sunday","units":83.0,"revenue":16185.0,"profit":7034.25,"margin":0.4346153846153846,"basicRevenue":7215.0,"advancedRevenue":14625.0,"basicUnits":37.0,"advancedUnits":75.0,"isWeekend":true,"isFestival":true},{"date":"2025-10-20","month":"2025-10","day":"Monday","units":65.0,"revenue":12675.0,"profit":5508.75,"margin":0.4346153846153846,"basicRevenue":7410.0,"advancedRevenue":14625.0,"basicUnits":38.0,"advancedUnits":75.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-21","month":"2025-10","day":"Tuesday","units":64.0,"revenue":12480.0,"profit":5424.0,"margin":0.4346153846153846,"basicRevenue":7410.0,"advancedRevenue":19305.0,"basicUnits":38.0,"advancedUnits":99.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-22","month":"2025-10","day":"Wednesday","units":54.0,"revenue":10530.0,"profit":4576.5,"margin":0.4346153846153846,"basicRevenue":7605.0,"advancedRevenue":20670.0,"basicUnits":39.0,"advancedUnits":106.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-23","month":"2025-10","day":"Thursday","units":56.0,"revenue":10920.0,"profit":4746.0,"margin":0.4346153846153846,"basicRevenue":7605.0,"advancedRevenue":21645.0,"basicUnits":39.0,"advancedUnits":111.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-24","month":"2025-10","day":"Friday","units":53.0,"revenue":10335.0,"profit":4491.75,"margin":0.4346153846153846,"basicRevenue":7800.0,"advancedRevenue":12675.0,"basicUnits":40.0,"advancedUnits":65.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-25","month":"2025-10","day":"Saturday","units":92.0,"revenue":17940.0,"profit":7797.0,"margin":0.4346153846153846,"basicRevenue":7800.0,"advancedRevenue":12870.0,"basicUnits":40.0,"advancedUnits":66.0,"isWeekend":true,"isFestival":false},{"date":"2025-10-26","month":"2025-10","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":7995.0,"advancedRevenue":10140.0,"basicUnits":41.0,"advancedUnits":52.0,"isWeekend":true,"isFestival":false},{"date":"2025-10-27","month":"2025-10","day":"Monday","units":54.0,"revenue":10530.0,"profit":4576.5,"margin":0.4346153846153846,"basicRevenue":7995.0,"advancedRevenue":11505.0,"basicUnits":41.0,"advancedUnits":59.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-28","month":"2025-10","day":"Tuesday","units":48.0,"revenue":9360.0,"profit":4068.0,"margin":0.4346153846153846,"basicRevenue":8190.0,"advancedRevenue":14430.0,"basicUnits":42.0,"advancedUnits":74.0,"isWeekend":false,"isFestival":false},{"date":"2025-10-29","month":"2025-10","day":"Wednesday","units":66.0,"revenue":12870.0,"profit":5593.5,"margin":0.4346153846153846,"basicRevenue":8190.0,"advancedRevenue":25350.0,"basicUnits":42.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-30","month":"2025-10","day":"Thursday","units":58.0,"revenue":11310.0,"profit":4915.5,"margin":0.4346153846153846,"basicRevenue":8385.0,"advancedRevenue":25350.0,"basicUnits":43.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":true},{"date":"2025-10-31","month":"2025-10","day":"Friday","units":65.0,"revenue":12675.0,"profit":5508.75,"margin":0.4346153846153846,"basicRevenue":8385.0,"advancedRevenue":25350.0,"basicUnits":43.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":true},{"date":"2025-11-01","month":"2025-11","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":8580.0,"advancedRevenue":19890.0,"basicUnits":44.0,"advancedUnits":102.0,"isWeekend":true,"isFestival":true},{"date":"2025-11-02","month":"2025-11","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":8580.0,"advancedRevenue":19500.0,"basicUnits":44.0,"advancedUnits":100.0,"isWeekend":true,"isFestival":true},{"date":"2025-11-03","month":"2025-11","day":"Monday","units":55.0,"revenue":10725.0,"profit":4661.25,"margin":0.4346153846153846,"basicRevenue":8775.0,"advancedRevenue":20670.0,"basicUnits":45.0,"advancedUnits":106.0,"isWeekend":false,"isFestival":true},{"date":"2025-11-04","month":"2025-11","day":"Tuesday","units":70.0,"revenue":13650.0,"profit":5932.5,"margin":0.4346153846153846,"basicRevenue":8775.0,"advancedRevenue":25350.0,"basicUnits":45.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":true},{"date":"2025-11-05","month":"2025-11","day":"Wednesday","units":49.0,"revenue":9555.0,"profit":4152.75,"margin":0.4346153846153846,"basicRevenue":8970.0,"advancedRevenue":21840.0,"basicUnits":46.0,"advancedUnits":112.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-06","month":"2025-11","day":"Thursday","units":62.0,"revenue":12090.0,"profit":5254.5,"margin":0.4346153846153846,"basicRevenue":8970.0,"advancedRevenue":22815.0,"basicUnits":46.0,"advancedUnits":117.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-07","month":"2025-11","day":"Friday","units":64.0,"revenue":12480.0,"profit":5424.0,"margin":0.4346153846153846,"basicRevenue":9165.0,"advancedRevenue":18330.0,"basicUnits":47.0,"advancedUnits":94.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-08","month":"2025-11","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":9360.0,"advancedRevenue":16575.0,"basicUnits":48.0,"advancedUnits":85.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-09","month":"2025-11","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":9360.0,"advancedRevenue":13650.0,"basicUnits":48.0,"advancedUnits":70.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-10","month":"2025-11","day":"Monday","units":53.0,"revenue":10335.0,"profit":4491.75,"margin":0.4346153846153846,"basicRevenue":9555.0,"advancedRevenue":15015.0,"basicUnits":49.0,"advancedUnits":77.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-11","month":"2025-11","day":"Tuesday","units":60.0,"revenue":11700.0,"profit":5085.0,"margin":0.4346153846153846,"basicRevenue":9555.0,"advancedRevenue":18915.0,"basicUnits":49.0,"advancedUnits":97.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-12","month":"2025-11","day":"Wednesday","units":68.0,"revenue":13260.0,"profit":5763.0,"margin":0.4346153846153846,"basicRevenue":9750.0,"advancedRevenue":20280.0,"basicUnits":50.0,"advancedUnits":104.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-13","month":"2025-11","day":"Thursday","units":56.0,"revenue":10920.0,"profit":4746.0,"margin":0.4346153846153846,"basicRevenue":9750.0,"advancedRevenue":19305.0,"basicUnits":50.0,"advancedUnits":99.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-14","month":"2025-11","day":"Friday","units":52.0,"revenue":10140.0,"profit":4407.0,"margin":0.4346153846153846,"basicRevenue":9945.0,"advancedRevenue":17745.0,"basicUnits":51.0,"advancedUnits":91.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-15","month":"2025-11","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":10140.0,"advancedRevenue":15990.0,"basicUnits":52.0,"advancedUnits":82.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-16","month":"2025-11","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":10140.0,"advancedRevenue":11115.0,"basicUnits":52.0,"advancedUnits":57.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-17","month":"2025-11","day":"Monday","units":66.0,"revenue":12870.0,"profit":5593.5,"margin":0.4346153846153846,"basicRevenue":10335.0,"advancedRevenue":12090.0,"basicUnits":53.0,"advancedUnits":62.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-18","month":"2025-11","day":"Tuesday","units":58.0,"revenue":11310.0,"profit":4915.5,"margin":0.4346153846153846,"basicRevenue":10530.0,"advancedRevenue":13455.0,"basicUnits":54.0,"advancedUnits":69.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-19","month":"2025-11","day":"Wednesday","units":65.0,"revenue":12675.0,"profit":5508.75,"margin":0.4346153846153846,"basicRevenue":10530.0,"advancedRevenue":17745.0,"basicUnits":54.0,"advancedUnits":91.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-20","month":"2025-11","day":"Thursday","units":59.0,"revenue":11505.0,"profit":5000.25,"margin":0.4346153846153846,"basicRevenue":10725.0,"advancedRevenue":18525.0,"basicUnits":55.0,"advancedUnits":95.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-21","month":"2025-11","day":"Friday","units":69.0,"revenue":13455.0,"profit":5847.75,"margin":0.4346153846153846,"basicRevenue":10920.0,"advancedRevenue":16185.0,"basicUnits":56.0,"advancedUnits":83.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-22","month":"2025-11","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":10920.0,"advancedRevenue":15210.0,"basicUnits":56.0,"advancedUnits":78.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-23","month":"2025-11","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":11115.0,"advancedRevenue":11505.0,"basicUnits":57.0,"advancedUnits":59.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-24","month":"2025-11","day":"Monday","units":59.0,"revenue":11505.0,"profit":5000.25,"margin":0.4346153846153846,"basicRevenue":11310.0,"advancedRevenue":13065.0,"basicUnits":58.0,"advancedUnits":67.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-25","month":"2025-11","day":"Tuesday","units":66.0,"revenue":12870.0,"profit":5593.5,"margin":0.4346153846153846,"basicRevenue":11310.0,"advancedRevenue":16965.0,"basicUnits":58.0,"advancedUnits":87.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-26","month":"2025-11","day":"Wednesday","units":71.0,"revenue":13845.0,"profit":6017.25,"margin":0.4346153846153846,"basicRevenue":11505.0,"advancedRevenue":20475.0,"basicUnits":59.0,"advancedUnits":105.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-27","month":"2025-11","day":"Thursday","units":76.0,"revenue":14820.0,"profit":6441.0,"margin":0.4346153846153846,"basicRevenue":11700.0,"advancedRevenue":21840.0,"basicUnits":60.0,"advancedUnits":112.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-28","month":"2025-11","day":"Friday","units":80.0,"revenue":15600.0,"profit":6780.0,"margin":0.4346153846153846,"basicRevenue":11700.0,"advancedRevenue":19500.0,"basicUnits":60.0,"advancedUnits":100.0,"isWeekend":false,"isFestival":false},{"date":"2025-11-29","month":"2025-11","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":11895.0,"advancedRevenue":15600.0,"basicUnits":61.0,"advancedUnits":80.0,"isWeekend":true,"isFestival":false},{"date":"2025-11-30","month":"2025-11","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":12090.0,"advancedRevenue":15990.0,"basicUnits":62.0,"advancedUnits":82.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-01","month":"2025-12","day":"Monday","units":81.0,"revenue":15795.0,"profit":6864.75,"margin":0.4346153846153846,"basicRevenue":12285.0,"advancedRevenue":17940.0,"basicUnits":63.0,"advancedUnits":92.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-02","month":"2025-12","day":"Tuesday","units":76.0,"revenue":14820.0,"profit":6441.0,"margin":0.4346153846153846,"basicRevenue":12285.0,"advancedRevenue":21450.0,"basicUnits":63.0,"advancedUnits":110.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-03","month":"2025-12","day":"Wednesday","units":84.0,"revenue":16380.0,"profit":7119.0,"margin":0.4346153846153846,"basicRevenue":12480.0,"advancedRevenue":23010.0,"basicUnits":64.0,"advancedUnits":118.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-04","month":"2025-12","day":"Thursday","units":85.0,"revenue":16575.0,"profit":7203.75,"margin":0.4346153846153846,"basicRevenue":12675.0,"advancedRevenue":25350.0,"basicUnits":65.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-05","month":"2025-12","day":"Friday","units":68.0,"revenue":13260.0,"profit":5763.0,"margin":0.4346153846153846,"basicRevenue":12870.0,"advancedRevenue":24570.0,"basicUnits":66.0,"advancedUnits":126.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-06","month":"2025-12","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":12870.0,"advancedRevenue":22620.0,"basicUnits":66.0,"advancedUnits":116.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-07","month":"2025-12","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":13065.0,"advancedRevenue":15990.0,"basicUnits":67.0,"advancedUnits":82.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-08","month":"2025-12","day":"Monday","units":69.0,"revenue":13455.0,"profit":5847.75,"margin":0.4346153846153846,"basicRevenue":13260.0,"advancedRevenue":16575.0,"basicUnits":68.0,"advancedUnits":85.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-09","month":"2025-12","day":"Tuesday","units":64.0,"revenue":12480.0,"profit":5424.0,"margin":0.4346153846153846,"basicRevenue":13455.0,"advancedRevenue":22425.0,"basicUnits":69.0,"advancedUnits":115.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-10","month":"2025-12","day":"Wednesday","units":69.0,"revenue":13455.0,"profit":5847.75,"margin":0.4346153846153846,"basicRevenue":13650.0,"advancedRevenue":23595.0,"basicUnits":70.0,"advancedUnits":121.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-11","month":"2025-12","day":"Thursday","units":70.0,"revenue":13650.0,"profit":5932.5,"margin":0.4346153846153846,"basicRevenue":13845.0,"advancedRevenue":25350.0,"basicUnits":71.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-12","month":"2025-12","day":"Friday","units":77.0,"revenue":15015.0,"profit":6525.75,"margin":0.4346153846153846,"basicRevenue":13845.0,"advancedRevenue":22035.0,"basicUnits":71.0,"advancedUnits":113.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-13","month":"2025-12","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":14040.0,"advancedRevenue":19110.0,"basicUnits":72.0,"advancedUnits":98.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-14","month":"2025-12","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":14235.0,"advancedRevenue":14820.0,"basicUnits":73.0,"advancedUnits":76.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-15","month":"2025-12","day":"Monday","units":65.0,"revenue":12675.0,"profit":5508.75,"margin":0.4346153846153846,"basicRevenue":14430.0,"advancedRevenue":15405.0,"basicUnits":74.0,"advancedUnits":79.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-16","month":"2025-12","day":"Tuesday","units":92.0,"revenue":17940.0,"profit":7797.0,"margin":0.4346153846153846,"basicRevenue":14625.0,"advancedRevenue":18135.0,"basicUnits":75.0,"advancedUnits":93.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-17","month":"2025-12","day":"Wednesday","units":71.0,"revenue":13845.0,"profit":6017.25,"margin":0.4346153846153846,"basicRevenue":14820.0,"advancedRevenue":20280.0,"basicUnits":76.0,"advancedUnits":104.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-18","month":"2025-12","day":"Thursday","units":86.0,"revenue":16770.0,"profit":7288.5,"margin":0.4346153846153846,"basicRevenue":15015.0,"advancedRevenue":21450.0,"basicUnits":77.0,"advancedUnits":110.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-19","month":"2025-12","day":"Friday","units":73.0,"revenue":14235.0,"profit":6186.75,"margin":0.4346153846153846,"basicRevenue":15210.0,"advancedRevenue":20865.0,"basicUnits":78.0,"advancedUnits":107.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-20","month":"2025-12","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":15405.0,"advancedRevenue":16965.0,"basicUnits":79.0,"advancedUnits":87.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-21","month":"2025-12","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":15600.0,"advancedRevenue":15210.0,"basicUnits":80.0,"advancedUnits":78.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-22","month":"2025-12","day":"Monday","units":95.0,"revenue":18525.0,"profit":8051.25,"margin":0.4346153846153846,"basicRevenue":15600.0,"advancedRevenue":14820.0,"basicUnits":80.0,"advancedUnits":76.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-23","month":"2025-12","day":"Tuesday","units":83.0,"revenue":16185.0,"profit":7034.25,"margin":0.4346153846153846,"basicRevenue":15795.0,"advancedRevenue":17160.0,"basicUnits":81.0,"advancedUnits":88.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-24","month":"2025-12","day":"Wednesday","units":91.0,"revenue":17745.0,"profit":7712.25,"margin":0.4346153846153846,"basicRevenue":15990.0,"advancedRevenue":20085.0,"basicUnits":82.0,"advancedUnits":103.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-25","month":"2025-12","day":"Thursday","units":74.0,"revenue":14430.0,"profit":6271.5,"margin":0.4346153846153846,"basicRevenue":16185.0,"advancedRevenue":23595.0,"basicUnits":83.0,"advancedUnits":121.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-26","month":"2025-12","day":"Friday","units":67.0,"revenue":13065.0,"profit":5678.25,"margin":0.4346153846153846,"basicRevenue":16380.0,"advancedRevenue":21645.0,"basicUnits":84.0,"advancedUnits":111.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-27","month":"2025-12","day":"Saturday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":16575.0,"advancedRevenue":17160.0,"basicUnits":85.0,"advancedUnits":88.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-28","month":"2025-12","day":"Sunday","units":100.0,"revenue":19500.0,"profit":8475.0,"margin":0.4346153846153846,"basicRevenue":16770.0,"advancedRevenue":18720.0,"basicUnits":86.0,"advancedUnits":96.0,"isWeekend":true,"isFestival":false},{"date":"2025-12-29","month":"2025-12","day":"Monday","units":88.0,"revenue":17160.0,"profit":7458.0,"margin":0.4346153846153846,"basicRevenue":17160.0,"advancedRevenue":20670.0,"basicUnits":88.0,"advancedUnits":106.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-30","month":"2025-12","day":"Tuesday","units":95.0,"revenue":18525.0,"profit":8051.25,"margin":0.4346153846153846,"basicRevenue":17355.0,"advancedRevenue":23205.0,"basicUnits":89.0,"advancedUnits":119.0,"isWeekend":false,"isFestival":false},{"date":"2025-12-31","month":"2025-12","day":"Wednesday","units":71.0,"revenue":13845.0,"profit":6017.25,"margin":0.4346153846153846,"basicRevenue":17550.0,"advancedRevenue":25350.0,"basicUnits":90.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-01","month":"2026-01","day":"Thursday","units":48.0,"revenue":9360.0,"profit":4068.0,"margin":0.4346153846153846,"basicRevenue":17745.0,"advancedRevenue":25350.0,"basicUnits":91.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-02","month":"2026-01","day":"Friday","units":36.0,"revenue":7020.0,"profit":3051.0,"margin":0.4346153846153846,"basicRevenue":17940.0,"advancedRevenue":25350.0,"basicUnits":92.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-03","month":"2026-01","day":"Saturday","units":82.0,"revenue":15990.0,"profit":6949.5,"margin":0.4346153846153846,"basicRevenue":18135.0,"advancedRevenue":22815.0,"basicUnits":93.0,"advancedUnits":117.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-04","month":"2026-01","day":"Sunday","units":83.0,"revenue":16185.0,"profit":7034.25,"margin":0.4346153846153846,"basicRevenue":18330.0,"advancedRevenue":20280.0,"basicUnits":94.0,"advancedUnits":104.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-05","month":"2026-01","day":"Monday","units":40.0,"revenue":7800.0,"profit":3390.0,"margin":0.4346153846153846,"basicRevenue":18525.0,"advancedRevenue":22620.0,"basicUnits":95.0,"advancedUnits":116.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-06","month":"2026-01","day":"Tuesday","units":45.0,"revenue":8775.0,"profit":3813.75,"margin":0.4346153846153846,"basicRevenue":18720.0,"advancedRevenue":25155.0,"basicUnits":96.0,"advancedUnits":129.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-07","month":"2026-01","day":"Wednesday","units":39.0,"revenue":7605.0,"profit":3305.25,"margin":0.4346153846153846,"basicRevenue":19110.0,"advancedRevenue":25350.0,"basicUnits":98.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-08","month":"2026-01","day":"Thursday","units":50.0,"revenue":9750.0,"profit":4237.5,"margin":0.4346153846153846,"basicRevenue":19305.0,"advancedRevenue":25350.0,"basicUnits":99.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-09","month":"2026-01","day":"Friday","units":50.0,"revenue":9750.0,"profit":4237.5,"margin":0.4346153846153846,"basicRevenue":19500.0,"advancedRevenue":25350.0,"basicUnits":100.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-10","month":"2026-01","day":"Saturday","units":79.0,"revenue":15405.0,"profit":6695.25,"margin":0.4346153846153846,"basicRevenue":19695.0,"advancedRevenue":21840.0,"basicUnits":101.0,"advancedUnits":112.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-11","month":"2026-01","day":"Sunday","units":94.0,"revenue":18330.0,"profit":7966.5,"margin":0.4346153846153846,"basicRevenue":19890.0,"advancedRevenue":17745.0,"basicUnits":102.0,"advancedUnits":91.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-12","month":"2026-01","day":"Monday","units":43.0,"revenue":8385.0,"profit":3644.25,"margin":0.4346153846153846,"basicRevenue":20280.0,"advancedRevenue":20865.0,"basicUnits":104.0,"advancedUnits":107.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-13","month":"2026-01","day":"Tuesday","units":49.0,"revenue":9555.0,"profit":4152.75,"margin":0.4346153846153846,"basicRevenue":20475.0,"advancedRevenue":22815.0,"basicUnits":105.0,"advancedUnits":117.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-14","month":"2026-01","day":"Wednesday","units":50.0,"revenue":9750.0,"profit":4237.5,"margin":0.4346153846153846,"basicRevenue":20670.0,"advancedRevenue":23985.0,"basicUnits":106.0,"advancedUnits":123.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-15","month":"2026-01","day":"Thursday","units":41.0,"revenue":7995.0,"profit":3474.75,"margin":0.4346153846153846,"basicRevenue":20865.0,"advancedRevenue":25350.0,"basicUnits":107.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-16","month":"2026-01","day":"Friday","units":39.0,"revenue":7605.0,"profit":3305.25,"margin":0.4346153846153846,"basicRevenue":21255.0,"advancedRevenue":21645.0,"basicUnits":109.0,"advancedUnits":111.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-17","month":"2026-01","day":"Saturday","units":67.0,"revenue":13065.0,"profit":5678.25,"margin":0.4346153846153846,"basicRevenue":21450.0,"advancedRevenue":20475.0,"basicUnits":110.0,"advancedUnits":105.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-18","month":"2026-01","day":"Sunday","units":70.0,"revenue":13650.0,"profit":5932.5,"margin":0.4346153846153846,"basicRevenue":21645.0,"advancedRevenue":15210.0,"basicUnits":111.0,"advancedUnits":78.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-19","month":"2026-01","day":"Monday","units":42.0,"revenue":8190.0,"profit":3559.5,"margin":0.4346153846153846,"basicRevenue":22035.0,"advancedRevenue":17745.0,"basicUnits":113.0,"advancedUnits":91.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-20","month":"2026-01","day":"Tuesday","units":43.0,"revenue":8385.0,"profit":3644.25,"margin":0.4346153846153846,"basicRevenue":22230.0,"advancedRevenue":19500.0,"basicUnits":114.0,"advancedUnits":100.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-21","month":"2026-01","day":"Wednesday","units":49.0,"revenue":9555.0,"profit":4152.75,"margin":0.4346153846153846,"basicRevenue":22425.0,"advancedRevenue":24570.0,"basicUnits":115.0,"advancedUnits":126.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-22","month":"2026-01","day":"Thursday","units":52.0,"revenue":10140.0,"profit":4407.0,"margin":0.4346153846153846,"basicRevenue":22815.0,"advancedRevenue":24960.0,"basicUnits":117.0,"advancedUnits":128.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-23","month":"2026-01","day":"Friday","units":46.0,"revenue":8970.0,"profit":3898.5,"margin":0.4346153846153846,"basicRevenue":23010.0,"advancedRevenue":22035.0,"basicUnits":118.0,"advancedUnits":113.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-24","month":"2026-01","day":"Saturday","units":87.0,"revenue":16965.0,"profit":7373.25,"margin":0.4346153846153846,"basicRevenue":23400.0,"advancedRevenue":21255.0,"basicUnits":120.0,"advancedUnits":109.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-25","month":"2026-01","day":"Sunday","units":72.0,"revenue":14040.0,"profit":6102.0,"margin":0.4346153846153846,"basicRevenue":23595.0,"advancedRevenue":18330.0,"basicUnits":121.0,"advancedUnits":94.0,"isWeekend":true,"isFestival":false},{"date":"2026-01-26","month":"2026-01","day":"Monday","units":47.0,"revenue":9165.0,"profit":3983.25,"margin":0.4346153846153846,"basicRevenue":23790.0,"advancedRevenue":19110.0,"basicUnits":122.0,"advancedUnits":98.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-27","month":"2026-01","day":"Tuesday","units":52.0,"revenue":10140.0,"profit":4407.0,"margin":0.4346153846153846,"basicRevenue":24180.0,"advancedRevenue":23400.0,"basicUnits":124.0,"advancedUnits":120.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-28","month":"2026-01","day":"Wednesday","units":37.0,"revenue":7215.0,"profit":3135.75,"margin":0.4346153846153846,"basicRevenue":24375.0,"advancedRevenue":25350.0,"basicUnits":125.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-29","month":"2026-01","day":"Thursday","units":42.0,"revenue":8190.0,"profit":3559.5,"margin":0.4346153846153846,"basicRevenue":24765.0,"advancedRevenue":25350.0,"basicUnits":127.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-30","month":"2026-01","day":"Friday","units":42.0,"revenue":8190.0,"profit":3559.5,"margin":0.4346153846153846,"basicRevenue":24960.0,"advancedRevenue":25350.0,"basicUnits":128.0,"advancedUnits":130.0,"isWeekend":false,"isFestival":false},{"date":"2026-01-31","month":"2026-01","day":"Saturday","units":93.0,"revenue":18135.0,"profit":7881.75,"margin":0.4346153846153846,"basicRevenue":25350.0,"advancedRevenue":24375.0,"basicUnits":130.0,"advancedUnits":125.0,"isWeekend":true,"isFestival":false}],"models":[{"model":"Basic","forecast_units":10083.0,"forecast_revenue":1966185.0,"forecast_profit":822133.7250000001,"unit_mae":19.009302325581395,"unit_rmse":28.551951833252524,"revenue_mape":0.4058138999670536,"revenue_bias_pct":-0.01533203125},{"model":"Advanced","forecast_units":15385.0,"forecast_revenue":3000075.0,"forecast_profit":1238859.245,"unit_mae":29.08372093023256,"unit_rmse":36.67703165692107,"revenue_mape":0.9010382736285416,"revenue_bias_pct":0.50244140625}],"festival":[{"is_festival_window":"Non-festival window","days":201.0,"avg_daily_units":46.004975124378106,"avg_daily_revenue":8970.970149253732,"avg_daily_profit":3732.1935323383086,"total_revenue":1803165.0,"total_profit":750170.9},{"is_festival_window":"Festival window","days":14.0,"avg_daily_units":70.92857142857143,"avg_daily_revenue":13831.07142857143,"avg_daily_profit":6011.196428571428,"total_revenue":193635.0,"total_profit":84156.75}],"costPhase":[{"cost_phase":"Post cost optimization","days":123.0,"units":8517.0,"revenue":1660815.0,"profit":721815.75,"avg_unit_cost":110.25,"gross_margin":0.4346153846153846},{"cost_phase":"Pre cost optimization","days":92.0,"units":1723.0,"revenue":335985.0,"profit":112511.9,"avg_unit_cost":129.7,"gross_margin":0.33487179487179486}],"delayMonthly":[{"month":"2025-07","risk":1365.0,"delayDays":2.0},{"month":"2025-08","risk":0.0,"delayDays":0.0},{"month":"2025-09","risk":2925.0,"delayDays":1.0},{"month":"2025-10","risk":7020.0,"delayDays":1.0},{"month":"2025-11","risk":0.0,"delayDays":0.0},{"month":"2025-12","risk":20280.0,"delayDays":3.0},{"month":"2026-01","risk":6045.0,"delayDays":1.0}],"weekday":[{"day":"Monday","avgUnits":40.7},{"day":"Tuesday","avgUnits":41.38709677419355},{"day":"Wednesday","avgUnits":40.83870967741935},{"day":"Thursday","avgUnits":39.774193548387096},{"day":"Friday","avgUnits":40.03225806451613},{"day":"Saturday","avgUnits":66.74193548387096},{"day":"Sunday","avgUnits":64.23333333333333}],"bestDay":{"date":"2025-10-18","units":100.0,"revenue":19500.0,"profit":8475.0},"worstDay":{"date":"2025-07-01","units":6.0,"revenue":1170.0,"profit":391.8},"postFestive":{"decemberRevenue":505830.0,"januaryRevenue":333255.0,"decemberUnits":2594.0,"januaryUnits":1709.0,"revenueDropPct":-0.34117193523515804,"unitDropPct":-0.34117193523515804,"label":"January post-festive/New Year normalization"},"insights":[{"label":"Margin unlock","text":"Procurement optimization lifted gross margin from 33.5% to 43.5% while the INR 195 selling price stayed constant."},{"label":"Seasonal demand","text":"Festival-window daily revenue was 54.2% above normal periods, so inventory should be built before demand arrives."},{"label":"January sales fall","text":"After the festive and New Year sales period, January revenue fell 34.1% from December as gifting demand normalized."},{"label":"Weekend behavior","text":"Weekend unit demand was 61.6% higher than weekday demand, making staffing and fulfillment planning important."},{"label":"Forecast governance","text":"The advanced scenario was useful for stress testing, but over-forecasted revenue by 50.2% and needs monthly calibration."}],"suggestions":["Create a festival readiness plan 3 to 4 weeks before Diwali and December gifting peaks.","Treat January as a post-festive demand reset: reduce aggressive procurement after New Year sales and shift focus to retention, bundles, and repeat purchases.","Use wholesale procurement contracts for wax, fragrance oils, jars, labels, and packaging to protect the 43.5% margin.","Separate baseline demand, weekend uplift, and festival uplift in every forecast review.","Track supplier lead time, stockout days, and reorder points to reduce simulated delay revenue risk.","Use actual-vs-forecast review meetings monthly so the advanced model stays realistic rather than optimistic."]};
+
+    const colors = {
+      ink: "#f4fff8",
+      muted: "#a8beb4",
+      line: "rgba(207, 236, 221, 0.16)",
+      blue: "#5ac8fa",
+      sage: "#62d2a2",
+      gold: "#f2c14e",
+      coral: "#ff7a66",
+      plum: "#b68cff",
+      mint: "#9ef0c1"
+    };
+
+    const tooltip = document.getElementById("tooltip");
+    let forecastMetric = "revenue";
+
+    function number(value) {
+      return Number(value || 0);
+    }
+
+    function fmtINR(value) {
+      value = number(value);
+      if (Math.abs(value) >= 100000) return "INR " + (value / 100000).toFixed(2) + "L";
+      return "INR " + value.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    }
+
+    function fmtFullINR(value) {
+      return "INR " + number(value).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    }
+
+    function fmtPct(value) {
+      return (number(value) * 100).toFixed(1) + "%";
+    }
+
+    function fmtUnits(value) {
+      return number(value).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    }
+
+    function showTip(event, html) {
+      tooltip.innerHTML = html;
+      tooltip.style.left = event.clientX + "px";
+      tooltip.style.top = event.clientY + "px";
+      tooltip.style.opacity = "1";
+    }
+
+    function hideTip() {
+      tooltip.style.opacity = "0";
+    }
+
+    function createSvg(containerId, width = 900, height = 360) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("role", "img");
+      container.appendChild(svg);
+      return { svg, width, height };
+    }
+
+    function el(name, attrs = {}) {
+      const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+      return node;
+    }
+
+    function appendText(svg, x, y, text, attrs = {}) {
+      const node = el("text", { x, y, ...attrs });
+      node.textContent = text;
+      svg.appendChild(node);
+      return node;
+    }
+
+    function linearScale(domainMin, domainMax, rangeMin, rangeMax) {
+      const span = domainMax - domainMin || 1;
+      return value => rangeMin + ((value - domainMin) / span) * (rangeMax - rangeMin);
+    }
+
+    function drawGrid(svg, plot, maxValue, ticks = 4, formatter = fmtINR) {
+      for (let i = 0; i <= ticks; i++) {
+        const value = (maxValue / ticks) * i;
+        const y = linearScale(0, maxValue, plot.bottom, plot.top)(value);
+        svg.appendChild(el("line", { x1: plot.left, x2: plot.right, y1: y, y2: y, class: "grid-line" }));
+        appendText(svg, plot.left - 10, y + 4, formatter(value), {
+          "text-anchor": "end",
+          fill: colors.muted,
+          "font-size": 12
+        });
+      }
+    }
+
+    function pathFromPoints(points) {
+      return points.map((point, index) => `${index === 0 ? "M" : "L"}${point[0]},${point[1]}`).join(" ");
+    }
+
+    function drawMonthlyCombo() {
+      const data = DASHBOARD_DATA.monthly;
+      const { svg, width, height } = createSvg("monthlyCombo", 900, 360);
+      const plot = { left: 86, right: width - 36, top: 22, bottom: height - 54 };
+      const maxMoney = Math.max(...data.map(d => Math.max(number(d.revenue), number(d.profit)))) * 1.15;
+      const yMoney = linearScale(0, maxMoney, plot.bottom, plot.top);
+      const yMargin = linearScale(0.30, 0.46, plot.bottom, plot.top);
+      drawGrid(svg, plot, maxMoney, 4, fmtINR);
+      const group = (plot.right - plot.left) / data.length;
+      const barWidth = Math.min(42, group * 0.28);
+      const marginPoints = [];
+      data.forEach((d, i) => {
+        const center = plot.left + group * i + group / 2;
+        const revHeight = plot.bottom - yMoney(number(d.revenue));
+        const profitHeight = plot.bottom - yMoney(number(d.profit));
+        const rev = el("rect", { x: center - barWidth - 3, y: yMoney(number(d.revenue)), width: barWidth, height: revHeight, rx: 3, fill: colors.blue });
+        const profit = el("rect", { x: center + 3, y: yMoney(number(d.profit)), width: barWidth, height: profitHeight, rx: 3, fill: colors.sage });
+        [rev, profit].forEach(node => {
+          node.addEventListener("mousemove", event => showTip(event, `<strong>${d.month}</strong><br>Revenue: ${fmtFullINR(d.revenue)}<br>Profit: ${fmtFullINR(d.profit)}<br>Margin: ${fmtPct(d.gross_margin)}`));
+          node.addEventListener("mouseleave", hideTip);
+          svg.appendChild(node);
+        });
+        marginPoints.push([center, yMargin(number(d.gross_margin))]);
+        appendText(svg, center, plot.bottom + 24, d.month.slice(5), { "text-anchor": "middle", fill: colors.muted, "font-size": 12 });
+      });
+      svg.appendChild(el("path", { d: pathFromPoints(marginPoints), fill: "none", stroke: colors.coral, "stroke-width": 3 }));
+      marginPoints.forEach((point, i) => {
+        const dot = el("circle", { cx: point[0], cy: point[1], r: 5, fill: colors.coral });
+        dot.addEventListener("mousemove", event => showTip(event, `<strong>${data[i].month}</strong><br>Gross margin: ${fmtPct(data[i].gross_margin)}`));
+        dot.addEventListener("mouseleave", hideTip);
+        svg.appendChild(dot);
+      });
+      const decIndex = data.findIndex(d => d.month === "2025-12");
+      const janIndex = data.findIndex(d => d.month === "2026-01");
+      if (decIndex >= 0 && janIndex >= 0) {
+        const dec = data[decIndex];
+        const jan = data[janIndex];
+        const decCenter = plot.left + group * decIndex + group / 2;
+        const janCenter = plot.left + group * janIndex + group / 2;
+        const decY = yMoney(number(dec.revenue));
+        const janY = yMoney(number(jan.revenue));
+        svg.appendChild(el("line", {
+          x1: decCenter + 16,
+          y1: decY - 16,
+          x2: janCenter - 16,
+          y2: janY - 16,
+          stroke: colors.coral,
+          "stroke-width": 2.4,
+          "stroke-dasharray": "6 5",
+          filter: "drop-shadow(0 0 7px rgba(255, 122, 102, 0.38))"
+        }));
+        appendText(svg, janCenter - 18, janY - 42, `Jan fall ${fmtPct(DASHBOARD_DATA.postFestive.revenueDropPct)}`, {
+          "text-anchor": "middle",
+          fill: colors.coral,
+          "font-size": 13,
+          "font-weight": 800
+        });
+        appendText(svg, janCenter - 18, janY - 25, "post festive/New Year", {
+          "text-anchor": "middle",
+          fill: colors.muted,
+          "font-size": 11
+        });
+      }
+      appendText(svg, plot.left, height - 8, "Month", { fill: colors.muted, "font-size": 12 });
+    }
+
+    function rollingAverage(values, windowSize) {
+      return values.map((_, index) => {
+        const start = Math.max(0, index - windowSize + 1);
+        const slice = values.slice(start, index + 1);
+        return slice.reduce((sum, value) => sum + value, 0) / slice.length;
+      });
+    }
+
+    function drawDailyTrend() {
+      const data = DASHBOARD_DATA.daily;
+      const values = data.map(d => number(d.revenue));
+      const rolling = rollingAverage(values, 7);
+      const { svg, width, height } = createSvg("dailyTrend", 900, 360);
+      const plot = { left: 86, right: width - 34, top: 22, bottom: height - 54 };
+      const maxRevenue = Math.max(...values) * 1.12;
+      const y = linearScale(0, maxRevenue, plot.bottom, plot.top);
+      const x = linearScale(0, data.length - 1, plot.left, plot.right);
+      drawGrid(svg, plot, maxRevenue, 4, fmtINR);
+      const areaPoints = data.map((d, i) => [x(i), y(number(d.revenue))]);
+      svg.appendChild(el("path", { d: pathFromPoints(areaPoints), fill: "none", stroke: "rgba(90, 200, 250, 0.42)", "stroke-width": 1.5, opacity: 0.75 }));
+      const rollingPoints = rolling.map((value, i) => [x(i), y(value)]);
+      svg.appendChild(el("path", { d: pathFromPoints(rollingPoints), fill: "none", stroke: colors.mint, "stroke-width": 3.2, filter: "drop-shadow(0 0 7px rgba(158, 240, 193, 0.45))" }));
+      data.forEach((d, i) => {
+        if (d.isFestival) {
+          svg.appendChild(el("circle", { cx: x(i), cy: y(number(d.revenue)), r: 3.2, fill: colors.gold, opacity: 0.95 }));
+        }
+      });
+      const labels = ["2025-07", "2025-09", "2025-11", "2026-01"];
+      labels.forEach(label => {
+        const index = data.findIndex(d => d.month === label);
+        if (index >= 0) appendText(svg, x(index), plot.bottom + 24, label, { "text-anchor": "middle", fill: colors.muted, "font-size": 12 });
+      });
+      const overlay = el("rect", { x: plot.left, y: plot.top, width: plot.right - plot.left, height: plot.bottom - plot.top, fill: "transparent" });
+      overlay.addEventListener("mousemove", event => {
+        const rect = svg.getBoundingClientRect();
+        const pos = (event.clientX - rect.left) / rect.width * width;
+        const index = Math.max(0, Math.min(data.length - 1, Math.round((pos - plot.left) / (plot.right - plot.left) * (data.length - 1))));
+        const d = data[index];
+        showTip(event, `<strong>${d.date}</strong><br>Revenue: ${fmtFullINR(d.revenue)}<br>Profit: ${fmtFullINR(d.profit)}<br>Units: ${fmtUnits(d.units)}${d.isFestival ? "<br>Festival window" : ""}`);
+      });
+      overlay.addEventListener("mouseleave", hideTip);
+      svg.appendChild(overlay);
+    }
+
+    function drawHeatmap() {
+      const data = DASHBOARD_DATA.daily;
+      const months = [...new Set(data.map(d => d.month))];
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const grouped = {};
+      data.forEach(d => {
+        const key = d.month + "|" + d.day;
+        grouped[key] = grouped[key] || [];
+        grouped[key].push(number(d.units));
+      });
+      const cells = [];
+      months.forEach(month => {
+        days.forEach(day => {
+          const values = grouped[month + "|" + day] || [];
+          const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+          cells.push({ month, day, avg });
+        });
+      });
+      const maxAvg = Math.max(...cells.map(d => d.avg));
+      const { svg, width, height } = createSvg("heatmap", 900, 460);
+      const plot = { left: 98, right: width - 26, top: 28, bottom: height - 52 };
+      const cellW = (plot.right - plot.left) / months.length;
+      const cellH = (plot.bottom - plot.top) / days.length;
+      months.forEach((month, i) => appendText(svg, plot.left + cellW * i + cellW / 2, plot.top - 10, month.slice(5), { "text-anchor": "middle", fill: colors.muted, "font-size": 12 }));
+      days.forEach((day, i) => appendText(svg, plot.left - 10, plot.top + cellH * i + cellH / 2 + 4, day.slice(0, 3), { "text-anchor": "end", fill: colors.muted, "font-size": 12 }));
+      cells.forEach(cell => {
+        const x = plot.left + months.indexOf(cell.month) * cellW;
+        const y = plot.top + days.indexOf(cell.day) * cellH;
+        const intensity = cell.avg / maxAvg;
+        const fill = interpolateColor([17, 31, 28], [98, 210, 162], intensity);
+        const rect = el("rect", { x: x + 3, y: y + 3, width: cellW - 6, height: cellH - 6, rx: 5, fill });
+        rect.addEventListener("mousemove", event => showTip(event, `<strong>${cell.month} ${cell.day}</strong><br>Avg units: ${cell.avg.toFixed(1)}`));
+        rect.addEventListener("mouseleave", hideTip);
+        svg.appendChild(rect);
+        appendText(svg, x + cellW / 2, y + cellH / 2 + 5, Math.round(cell.avg), { "text-anchor": "middle", fill: intensity > 0.62 ? "#06100d" : colors.ink, "font-size": 12, "font-weight": 700 });
+      });
+    }
+
+    function interpolateColor(from, to, amount) {
+      const values = from.map((start, i) => Math.round(start + (to[i] - start) * amount));
+      return `rgb(${values[0]}, ${values[1]}, ${values[2]})`;
+    }
+
+    function drawForecastChart() {
+      const data = DASHBOARD_DATA.monthlyForecast;
+      const metric = forecastMetric;
+      const columns = metric === "revenue"
+        ? ["actual_revenue", "basic_revenue", "advanced_revenue"]
+        : metric === "profit"
+          ? ["actual_profit", "basic_profit", "advanced_profit"]
+          : ["actual_units", "basic_units", "advanced_units"];
+      const labels = ["Actual", "Basic", "Advanced"];
+      const palette = [colors.mint, colors.blue, colors.gold];
+      const formatter = metric === "units" ? fmtUnits : fmtINR;
+      const { svg, width, height } = createSvg("forecastChart", 900, 360);
+      const plot = { left: 86, right: width - 34, top: 22, bottom: height - 54 };
+      const maxValue = Math.max(...data.flatMap(d => columns.map(column => number(d[column])))) * 1.15;
+      const y = linearScale(0, maxValue, plot.bottom, plot.top);
+      drawGrid(svg, plot, maxValue, 4, formatter);
+      const group = (plot.right - plot.left) / data.length;
+      const barW = Math.min(28, group * 0.21);
+      data.forEach((d, i) => {
+        const center = plot.left + group * i + group / 2;
+        columns.forEach((column, j) => {
+          const x = center + (j - 1) * (barW + 4);
+          const value = number(d[column]);
+          const bar = el("rect", { x, y: y(value), width: barW, height: plot.bottom - y(value), rx: 3, fill: palette[j] });
+          bar.addEventListener("mousemove", event => showTip(event, `<strong>${d.month}</strong><br>${labels[j]} ${metric}: ${formatter(value)}`));
+          bar.addEventListener("mouseleave", hideTip);
+          svg.appendChild(bar);
+        });
+        appendText(svg, center, plot.bottom + 24, d.month.slice(5), { "text-anchor": "middle", fill: colors.muted, "font-size": 12 });
+      });
+      drawInlineLegend(svg, plot.left, height - 12, labels, palette);
+    }
+
+    function drawInlineLegend(svg, x, y, labels, palette) {
+      labels.forEach((label, i) => {
+        const offset = i * 112;
+        svg.appendChild(el("rect", { x: x + offset, y: y - 10, width: 12, height: 12, rx: 2, fill: palette[i] }));
+        appendText(svg, x + offset + 18, y, label, { fill: colors.muted, "font-size": 12 });
+      });
+    }
+
+    function drawModelDiagnostics() {
+      const data = DASHBOARD_DATA.models;
+      const { svg, width, height } = createSvg("modelDiagnostics", 900, 360);
+      const plot = { left: 86, right: width - 34, top: 24, bottom: height - 58 };
+      const maxMae = Math.max(...data.map(d => number(d.unit_mae))) * 1.25;
+      const x = linearScale(0, maxMae, plot.left, plot.right - 160);
+      data.forEach((d, i) => {
+        const y = plot.top + i * 105 + 30;
+        appendText(svg, plot.left, y - 14, d.model, { fill: colors.ink, "font-size": 16, "font-weight": 750 });
+        svg.appendChild(el("rect", { x: plot.left, y, width: x(number(d.unit_mae)) - plot.left, height: 30, rx: 5, fill: i === 0 ? colors.blue : colors.gold, filter: i === 0 ? "drop-shadow(0 0 8px rgba(90, 200, 250, 0.32))" : "drop-shadow(0 0 8px rgba(242, 193, 78, 0.30))" }));
+        appendText(svg, x(number(d.unit_mae)) + 10, y + 20, `${number(d.unit_mae).toFixed(1)} MAE`, { fill: colors.muted, "font-size": 13 });
+        appendText(svg, plot.right - 150, y + 20, `Bias ${fmtPct(d.revenue_bias_pct)}`, { fill: number(d.revenue_bias_pct) > 0 ? colors.coral : colors.sage, "font-size": 14, "font-weight": 750 });
+        appendText(svg, plot.left, y + 58, `RMSE ${number(d.unit_rmse).toFixed(1)} | MAPE ${(number(d.revenue_mape) * 100).toFixed(1)}%`, { fill: colors.muted, "font-size": 12 });
+      });
+    }
+
+    function drawMarginBars() {
+      const data = DASHBOARD_DATA.costPhase;
+      const { svg, width, height } = createSvg("marginBars", 900, 360);
+      const plot = { left: 90, right: width - 42, top: 28, bottom: height - 70 };
+      const maxMargin = Math.max(...data.map(d => number(d.gross_margin))) * 1.25;
+      const y = linearScale(0, maxMargin, plot.bottom, plot.top);
+      drawGrid(svg, plot, maxMargin, 4, value => (value * 100).toFixed(0) + "%");
+      const group = (plot.right - plot.left) / data.length;
+      data.forEach((d, i) => {
+        const barW = Math.min(120, group * 0.36);
+        const center = plot.left + group * i + group / 2;
+        const value = number(d.gross_margin);
+        const bar = el("rect", { x: center - barW / 2, y: y(value), width: barW, height: plot.bottom - y(value), rx: 6, fill: i === 0 ? colors.gold : colors.sage, filter: i === 0 ? "drop-shadow(0 0 8px rgba(242, 193, 78, 0.28))" : "drop-shadow(0 0 9px rgba(98, 210, 162, 0.32))" });
+        bar.addEventListener("mousemove", event => showTip(event, `<strong>${d.cost_phase}</strong><br>Margin: ${fmtPct(d.gross_margin)}<br>Avg unit cost: ${fmtFullINR(d.avg_unit_cost)}<br>Profit: ${fmtFullINR(d.profit)}`));
+        bar.addEventListener("mouseleave", hideTip);
+        svg.appendChild(bar);
+        appendText(svg, center, y(value) - 10, fmtPct(value), { "text-anchor": "middle", fill: colors.ink, "font-size": 15, "font-weight": 750 });
+        appendText(svg, center, plot.bottom + 24, i === 0 ? "Pre Oct" : "Post Oct", { "text-anchor": "middle", fill: colors.muted, "font-size": 12 });
+      });
+    }
+
+    function drawDelayRisk() {
+      const data = DASHBOARD_DATA.delayMonthly;
+      const { svg, width, height } = createSvg("delayRisk", 900, 360);
+      const plot = { left: 86, right: width - 34, top: 26, bottom: height - 54 };
+      const maxRisk = Math.max(...data.map(d => number(d.risk)), 1) * 1.2;
+      const y = linearScale(0, maxRisk, plot.bottom, plot.top);
+      drawGrid(svg, plot, maxRisk, 4, fmtINR);
+      const group = (plot.right - plot.left) / data.length;
+      const barW = Math.min(52, group * 0.42);
+      data.forEach((d, i) => {
+        const center = plot.left + group * i + group / 2;
+        const risk = number(d.risk);
+        const bar = el("rect", { x: center - barW / 2, y: y(risk), width: barW, height: plot.bottom - y(risk), rx: 5, fill: risk > 0 ? colors.coral : "rgba(207, 236, 221, 0.18)", filter: risk > 0 ? "drop-shadow(0 0 8px rgba(255, 122, 102, 0.30))" : "none" });
+        bar.addEventListener("mousemove", event => showTip(event, `<strong>${d.month}</strong><br>Revenue at risk: ${fmtFullINR(risk)}<br>Delay days: ${number(d.delayDays).toFixed(0)}`));
+        bar.addEventListener("mouseleave", hideTip);
+        svg.appendChild(bar);
+        appendText(svg, center, plot.bottom + 24, d.month.slice(5), { "text-anchor": "middle", fill: colors.muted, "font-size": 12 });
+      });
+    }
+
+    function drawWeekdayBars() {
+      const data = DASHBOARD_DATA.weekday;
+      const { svg, width, height } = createSvg("weekdayBars", 900, 360);
+      const plot = { left: 76, right: width - 32, top: 24, bottom: height - 56 };
+      const maxUnits = Math.max(...data.map(d => number(d.avgUnits))) * 1.2;
+      const y = linearScale(0, maxUnits, plot.bottom, plot.top);
+      drawGrid(svg, plot, maxUnits, 4, value => value.toFixed(0));
+      const group = (plot.right - plot.left) / data.length;
+      const barW = Math.min(56, group * 0.48);
+      data.forEach((d, i) => {
+        const center = plot.left + group * i + group / 2;
+        const value = number(d.avgUnits);
+        const isWeekend = d.day === "Saturday" || d.day === "Sunday";
+        const bar = el("rect", { x: center - barW / 2, y: y(value), width: barW, height: plot.bottom - y(value), rx: 5, fill: isWeekend ? colors.plum : colors.sage });
+        bar.addEventListener("mousemove", event => showTip(event, `<strong>${d.day}</strong><br>Avg units: ${value.toFixed(1)}`));
+        bar.addEventListener("mouseleave", hideTip);
+        svg.appendChild(bar);
+        appendText(svg, center, plot.bottom + 24, d.day.slice(0, 3), { "text-anchor": "middle", fill: colors.muted, "font-size": 12 });
+      });
+      appendText(svg, plot.left, height - 8, "Average units sold", { fill: colors.muted, "font-size": 12 });
+    }
+
+    function buildCards() {
+      const k = DASHBOARD_DATA.kpis;
+      const cards = [
+        ["Actual revenue", fmtINR(k["Actual revenue"]), "Total operating revenue"],
+        ["Actual profit", fmtINR(k["Actual profit"]), "Profit after production cost"],
+        ["Gross margin", fmtPct(k["Actual gross margin"]), "Full-period margin"],
+        ["Units sold", fmtUnits(k["Units sold"]), "Actual units"],
+        ["Dec revenue", fmtINR(k["December revenue"]), "Peak monthly revenue"],
+        ["Jan sales fall", fmtPct(DASHBOARD_DATA.postFestive.revenueDropPct), "Post-festive/New Year drop"],
+        ["Forecast bias", fmtPct(k["Advanced forecast revenue bias"]), "Advanced scenario optimism"]
+      ];
+      document.getElementById("kpiCards").innerHTML = cards.map(card => `
+        <article class="metric-card">
+          <div class="label">${card[0]}</div>
+          <div class="value">${card[1]}</div>
+          <div class="note">${card[2]}</div>
+        </article>
+      `).join("");
+      document.getElementById("periodLabel").textContent = DASHBOARD_DATA.meta.period;
+      document.getElementById("bestDayLabel").textContent = `${DASHBOARD_DATA.bestDay.date} | ${fmtUnits(DASHBOARD_DATA.bestDay.units)} units`;
+    }
+
+    function buildInsights() {
+      document.getElementById("insightList").innerHTML = DASHBOARD_DATA.insights.map(item => `
+        <div class="insight-item">
+          <strong>${item.label}</strong>
+          <p>${item.text}</p>
+        </div>
+      `).join("");
+      document.getElementById("recList").innerHTML = DASHBOARD_DATA.suggestions.map((text, index) => `
+        <div class="rec-item">
+          <strong>${index + 1}. ${recommendationTitle(text)}</strong>
+          <p>${text}</p>
+        </div>
+      `).join("");
+      document.getElementById("operatingCallout").textContent = `Simulated delivery delays created ${fmtFullINR(DASHBOARD_DATA.kpis["Simulated delay revenue at risk"])} of revenue at risk across ${fmtUnits(DASHBOARD_DATA.kpis["Simulated delay days"])} delay days. The operational priority is to protect raw material availability before weekend and festival peaks.`;
+    }
+
+    function recommendationTitle(text) {
+      if (text.includes("festival")) return "Seasonal readiness";
+      if (text.includes("January")) return "January reset";
+      if (text.includes("wholesale")) return "Procurement discipline";
+      if (text.includes("baseline")) return "Demand planning";
+      if (text.includes("supplier")) return "Risk tracking";
+      return "Forecast governance";
+    }
+
+    function buildTables() {
+      document.getElementById("modelTable").innerHTML = `
+        <thead><tr><th>Model</th><th>Forecast revenue</th><th>Forecast profit</th><th>Unit MAE</th><th>Revenue MAPE</th><th>Revenue bias</th></tr></thead>
+        <tbody>${DASHBOARD_DATA.models.map(d => `
+          <tr><td>${d.model}</td><td>${fmtFullINR(d.forecast_revenue)}</td><td>${fmtFullINR(d.forecast_profit)}</td><td>${number(d.unit_mae).toFixed(1)}</td><td>${fmtPct(d.revenue_mape)}</td><td>${fmtPct(d.revenue_bias_pct)}</td></tr>
+        `).join("")}</tbody>
+      `;
+      const monthlyRows = DASHBOARD_DATA.monthly.map(d => `
+        <tr><td>${d.month}</td><td>${fmtUnits(d.units)}</td><td>${fmtFullINR(d.revenue)}</td><td>${fmtFullINR(d.profit)}</td><td>${fmtPct(d.gross_margin)}</td><td>${d.revenue_growth_pct === null ? "-" : fmtPct(d.revenue_growth_pct)}</td></tr>
+      `).join("");
+      const monthlyTable = `<thead><tr><th>Month</th><th>Units</th><th>Revenue</th><th>Profit</th><th>Margin</th><th>Growth</th></tr></thead><tbody>${monthlyRows}</tbody>`;
+      document.getElementById("monthlyTable").innerHTML = monthlyTable;
+      document.getElementById("performanceTable").innerHTML = monthlyTable;
+    }
+
+    function bindNavigation() {
+      document.querySelectorAll(".nav button").forEach(button => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
+          document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
+          button.classList.add("active");
+          document.getElementById(button.dataset.view).classList.add("active");
+          requestAnimationFrame(drawAll);
+        });
+      });
+      document.querySelectorAll("[data-forecast-metric]").forEach(button => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("[data-forecast-metric]").forEach(btn => btn.classList.remove("active"));
+          button.classList.add("active");
+          forecastMetric = button.dataset.forecastMetric;
+          drawForecastChart();
+        });
+      });
+      document.getElementById("focusBtn").addEventListener("click", () => {
+        document.body.classList.toggle("focus-mode");
+        requestAnimationFrame(drawAll);
+      });
+      document.getElementById("fullBtn").addEventListener("click", () => {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      });
+      window.addEventListener("resize", drawAll);
+    }
+
+    function drawAll() {
+      if (document.getElementById("overview").classList.contains("active")) drawMonthlyCombo();
+      if (document.getElementById("trends").classList.contains("active")) {
+        drawDailyTrend();
+        drawHeatmap();
+      }
+      if (document.getElementById("forecast").classList.contains("active")) {
+        drawForecastChart();
+        drawModelDiagnostics();
+      }
+      if (document.getElementById("operations").classList.contains("active")) {
+        drawMarginBars();
+        drawDelayRisk();
+        drawWeekdayBars();
+      }
+    }
+
+    function init() {
+      buildCards();
+      buildInsights();
+      buildTables();
+      bindNavigation();
+      drawAll();
+    }
+
+    init();
+  </script>
+</body>
+</html>
