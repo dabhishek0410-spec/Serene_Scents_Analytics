@@ -1,0 +1,18 @@
+metric,value
+Tenure,2025-07-01 to 2026-01-31
+Actual revenue,1996800.0
+Actual profit,834327.65
+Actual gross margin,0.41783235677083336
+Units sold,10240.0
+Average units per day,47.627906976744185
+Peak actual units per day,100.0
+July revenue,65130.0
+December revenue,505830.0
+July to December revenue growth,6.766467065868263
+Pre-optimization margin,0.33487179487179486
+Post-optimization margin,0.4346153846153846
+Festival avg daily revenue lift,0.5417587171128861
+Advanced forecast revenue bias,0.50244140625
+Basic forecast revenue bias,-0.01533203125
+Simulated delay days,8
+Simulated delay revenue at risk,37635.0

@@ -1,0 +1,3 @@
+is_festival_window,days,avg_daily_units,avg_daily_revenue,avg_daily_profit,total_revenue,total_profit
+Non-festival window,201,46.004975124378106,8970.970149253732,3732.1935323383086,1803165,750170.9
+Festival window,14,70.92857142857143,13831.07142857143,6011.196428571428,193635,84156.75

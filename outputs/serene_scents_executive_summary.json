@@ -1,0 +1,10 @@
+{
+  "actual_revenue": 1996800.0,
+  "actual_profit": 834327.65,
+  "actual_margin": 0.41783235677083336,
+  "total_units_sold": 10240,
+  "basic_revenue_bias_pct": -0.01533203125,
+  "advanced_revenue_bias_pct": 0.50244140625,
+  "simulated_delay_revenue_at_risk": 37635.0,
+  "figure_count": 6
+}
